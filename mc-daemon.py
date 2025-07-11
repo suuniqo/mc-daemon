@@ -214,8 +214,7 @@ bot = ServerManager(ServerEnv(), intents=intents)
 
 @bot.event
 async def on_ready():
-    print(f'Logged in as {bot.user} (ID: {bot.user.id})')
-    print('------')
+    pass
 
 @bot.tree.command(name="help", description="Consulta los comandos disponibles")
 async def help(inter: discord.Interaction):
