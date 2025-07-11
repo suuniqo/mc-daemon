@@ -400,8 +400,6 @@ async def inject(inter: discord.Interaction, comm: str) -> None:
             description=f"`{resp}`" if resp else None,
             color=discord.Color.red(),
         )
-        await inter.followup.send(
-                )
 
     await inter.followup.send(embed=embed)
 
