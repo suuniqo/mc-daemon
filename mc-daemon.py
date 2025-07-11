@@ -225,7 +225,7 @@ async def help(inter: discord.Interaction):
             "- `/status` Shows the server status\n"
             "- `/lock` Locks and closes the server (admin)\n"
             "- `/unlock` Unlocks the server (admin)\n"
-            "- `/inject` Executes the provided minecraft command in the server (admin)"
+            "- `/inject` Executes the provided command in the server (admin)"
         ),
         color=discord.Color.yellow()
     )
@@ -251,7 +251,8 @@ async def start(inter: discord.Interaction) -> None:
         mng.autoshutdown_start()
 
         embed = discord.Embed(
-            title=f"The server is ready {inter.user.mention}! ✅",
+            title=f"The server is ready ✅",
+            description=f"You can join now {inter.user.mention}!",
             color=discord.Color.green()
         )
 
@@ -305,7 +306,7 @@ async def status(inter: discord.Interaction) -> None:
         await inter.response.send_message(embed=embed)
     else:
         embed = discord.Embed(
-            title=f"The server is {status} 📊",
+            title=f"The server is {status}  📊",
             color=discord.Color.blue()
         )
         await inter.response.send_message(embed=embed)
@@ -367,7 +368,7 @@ async def unlock(inter: discord.Interaction) -> None:
 @app_commands.rename(comm="command")
 @app_commands.describe(comm="Command to execute")
 @app_commands.default_permissions(discord.Permissions(administrator=True))
-@bot.tree.command(name="inject", description="Executes the provided minecraft command in the server")
+@bot.tree.command(name="inject", description="Executes the provided command in the server")
 async def inject(inter: discord.Interaction, comm: str) -> None:
     mng = cast(ServerManager, inter.client)
 
@@ -390,13 +391,13 @@ async def inject(inter: discord.Interaction, comm: str) -> None:
     if success:
         embed = discord.Embed(
             title=f"The command was executed correctly ✅",
-            description=f"`{resp}`",
+            description=f"`{resp}`" if resp else None,
             color=discord.Color.green(),
         )
     else:
         embed = discord.Embed(
             title=f"Couldn't execute command ❌",
-            description=f"`{resp}`",
+            description=f"`{resp}`" if resp else None,
             color=discord.Color.red(),
         )
         await inter.followup.send(
