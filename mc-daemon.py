@@ -23,13 +23,13 @@ class ServerStatus(Enum):
     def __str__(self) -> str:
         match self:
             case ServerStatus.CLOSED:
-                return "cerrado"
+                return "closed"
             case ServerStatus.OPEN:
-                return "abierto"
+                return "open"
             case ServerStatus.OPENING:
-                return "abriéndose"
+                return "opening"
             case ServerStatus.CLOSING:
-                return "cerrándose"
+                return "closing"
 
 class ServerConn:
     PORT = 25565
@@ -173,7 +173,7 @@ class ServerManager(discord.Client):
         self.env = env
         self.cntl = ServerCntl(env.script, env.rconpwd)
         self.stamp = None
-        self.blocked = False
+        self.locked = False
         self.tree = app_commands.CommandTree(self)
 
     async def setup_hook(self) -> None:
@@ -191,7 +191,7 @@ class ServerManager(discord.Client):
         if self._autoshutdown.is_running():
             self._autoshutdown.stop()
 
-    @tasks.loop(seconds=60)
+    @tasks.loop(minutes=1)
     async def _autoshutdown(self) -> None:
         status = self.cntl.status()
 
@@ -216,43 +216,73 @@ bot = ServerManager(ServerEnv(), intents=intents)
 async def on_ready():
     pass
 
-@bot.tree.command(name="help", description="Consulta los comandos disponibles")
+@bot.tree.command(name="help", description="View available commands")
 async def help(inter: discord.Interaction):
-    await inter.response.send_message(
-            "**📋 Comandos disponibles:**\n"
-            "- `/start` Intenta iniciar el server\n"
-            "- `/status` Muestra el status del server\n"
-            "- `/lock` Apaga y bloquea el server (admin)\n"
-            "- `/unlock` Desbloquea el server (admin)\n"
-            "- `/inject` Ejecuta un comando el server (admin)"
-            )
+    embed = discord.Embed(
+        title="Available commands 📋",
+        description=(
+            "- `/start` Tries to start the server\n"
+            "- `/status` Shows the server status\n"
+            "- `/lock` Locks and closes the server (admin)\n"
+            "- `/unlock` Unlocks the server (admin)\n"
+            "- `/inject` Executes the provided minecraft command in the server (admin)"
+        ),
+        color=discord.Color.yellow()
+    )
 
-@bot.tree.command(name="start", description="Intenta iniciar el server")
+    await inter.response.send_message(embed=embed)
+
+@bot.tree.command(name="start", description="Tries to start the server")
 async def start(inter: discord.Interaction) -> None:
     mng = cast(ServerManager, inter.client)
 
-    if mng.blocked:
-        await inter.response.send_message(f"❌ El server ha sido bloqueado por los admins.")
+    if mng.locked:
+        embed = discord.Embed(
+            title="The server has been locked by admins ❌",
+            color=discord.Color.red()
+        )
+
+        await inter.response.send_message(embed=embed)
         return
 
     if mng.cntl.try_start():
         await inter.response.defer()
         await asyncio.to_thread(mng.cntl.wait_open)
         mng.autoshutdown_start()
-        await inter.followup.send(f"✅ ¡El server está listo {inter.user.mention}!")
+
+        embed = discord.Embed(
+            title=f"The server is ready {inter.user.mention}! ✅",
+            color=discord.Color.green()
+        )
+
+        await inter.followup.send(embed=embed)
+
         return
 
     status = mng.cntl.status()
 
+    embed = None
+
     match status:
         case ServerStatus.OPEN | ServerStatus.OPENING:
-            await inter.response.send_message(f"✅ El server ya está {status}.")
+            embed = discord.Embed(
+                title=f"The server is already {status} ✅",
+                color=discord.Color.green()
+            )
         case ServerStatus.CLOSING:
-            await inter.response.send_message(f"⚠️ El server está {status}, espera porfavor...")
+            embed = discord.Embed(
+                title=f"The server is {status}, please stand by ⚠️",
+                color=discord.Color.yellow()
+            )
         case ServerStatus.CLOSED:
-            await inter.response.send_message(f"❌ Inténtalo de nuevo porfavor")
+            embed = discord.Embed(
+                title="Please try again ❌",
+                color=discord.Color.red()
+            )
 
-@bot.tree.command(name="status", description="Muestra el status del server")
+    await inter.response.send_message(embed=embed)
+
+@bot.tree.command(name="status", description="Shows the server status")
 async def status(inter: discord.Interaction) -> None:
     mng = cast(ServerManager, inter.client)
 
@@ -266,23 +296,34 @@ async def status(inter: discord.Interaction) -> None:
         mins = int(remaining // 60)
         secs = int(remaining % 60)
 
-        await inter.response.send_message(
-                f"⚠️ El server está {status} pero vacío.\n"
-                f"Se cerrará en {mins} minutos y {secs} segundos si nadie se une."
-                )
+        embed = discord.Embed(
+            title=f"The server is {status} but empty ⚠️",
+            description=f"It will close in {mins} minutes and {secs} seconds if nobody joins",
+            color=discord.Color.yellow(),
+        )
+
+        await inter.response.send_message(embed=embed)
     else:
-        await inter.response.send_message(f"📊 El server está {status}.")
+        embed = discord.Embed(
+            title=f"The server is {status} 📊",
+            color=discord.Color.blue()
+        )
+        await inter.response.send_message(embed=embed)
 
 @app_commands.default_permissions(discord.Permissions(administrator=True))
-@bot.tree.command(name="lock", description="Apaga y bloquea el server")
+@bot.tree.command(name="lock", description="Locks and closes the server")
 async def lock(inter: discord.Interaction) -> None:
     mng = cast(ServerManager, inter.client)
 
-    if mng.blocked:
-        await inter.response.send_message(f"✅ El server ya estaba bloqueado.")
+    if mng.locked:
+        embed = discord.Embed(
+            title="The server was already locked ✅",
+            color=discord.Color.green()
+        )
+        await inter.response.send_message(embed=embed)
         return
 
-    mng.blocked = True
+    mng.locked = True
 
     await inter.response.defer()
 
@@ -296,48 +337,71 @@ async def lock(inter: discord.Interaction) -> None:
         mng.cntl.try_stop()
         mng.autoshutdown_stop()
 
-    await inter.followup.send(f"🔒 El server ha sido bloqueado.")
+    embed = discord.Embed(
+        title="The server has been locked 🔒",
+        color=discord.Color.yellow()
+    )
+    await inter.followup.send(embed=embed)
 
 @app_commands.default_permissions(discord.Permissions(administrator=True))
-@bot.tree.command(name="unlock", description="Desbloquea el server")
+@bot.tree.command(name="unlock", description="Unlocks the server")
 async def unlock(inter: discord.Interaction) -> None:
     mng = cast(ServerManager, inter.client)
 
-    if not mng.blocked:
-        await inter.response.send_message(f"✅ El server ya estaba desbloqueado.")
-        return
+    embed = None
 
-    mng.blocked = False
-    await inter.response.send_message(f"🔓 El server ha sido desbloqueado.")
+    if not mng.locked:
+        embed = discord.Embed(
+            title="The server was already locked ✅",
+            color=discord.Color.green()
+        )
+    else:
+        mng.locked = False
+        embed = discord.Embed(
+            title="The server has been unlocked 🔓",
+            color=discord.Color.yellow()
+        )
+
+    await inter.response.send_message(embed=embed)
 
 @app_commands.rename(comm="command")
-@app_commands.describe(comm="Comando a ejecutar.")
+@app_commands.describe(comm="Command to execute")
 @app_commands.default_permissions(discord.Permissions(administrator=True))
-@bot.tree.command(name="inject", description="Ejecuta un comando el server.")
+@bot.tree.command(name="inject", description="Executes the provided minecraft command in the server")
 async def inject(inter: discord.Interaction, comm: str) -> None:
     mng = cast(ServerManager, inter.client)
 
     status = mng.cntl.status()
 
     if status != ServerStatus.OPEN:
-        await inter.response.send_message(f"❌ No es posible inyectar comandos, el server está {status}.")
+        embed = discord.Embed(
+            title=f"It's not posible to execute commands, the server is {status} ❌",
+            color=discord.Color.red(),
+        )
+        await inter.response.send_message(embed=embed)
         return
 
     await inter.response.defer()
 
     success, resp = mng.cntl.command(comm)
 
-    if success:
-        await inter.followup.send(
-                f"✅ El comando se ejecuto correctamente:\n"
-                f"`{resp}`"
-                )
-    else:
-        await inter.followup.send(
-                f"❌ No se pudo ejecutar el comando:\n"
-                f"`{resp}`"
-                )
-        
+    embed = None
 
+    if success:
+        embed = discord.Embed(
+            title=f"The command was executed correctly ✅",
+            description=f"`{resp}`",
+            color=discord.Color.green(),
+        )
+    else:
+        embed = discord.Embed(
+            title=f"Couldn't execute command ❌",
+            description=f"`{resp}`",
+            color=discord.Color.red(),
+        )
+        await inter.followup.send(
+                )
+
+    await inter.followup.send(embed=embed)
 
 bot.run(bot.env.token)
