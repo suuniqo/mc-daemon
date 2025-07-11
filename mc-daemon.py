@@ -177,7 +177,7 @@ class ServerManager(discord.Client):
         self.tree = app_commands.CommandTree(self)
 
     async def on_ready(self) -> None:
-        await self.tree.sync(guild=env.guild)
+        await self.tree.sync(guild=self.env.guild)
 
     async def autoshutdown_wait(self) -> None:
         while not self._autoshutdown.is_running():
