@@ -70,7 +70,7 @@ class ServerEnv:
 class ServerRCON:
     PORT = 25575
     HOST = "127.0.0.1"
-    TIMEOUT = 5
+    TIMEOUT = 15
 
     def __init__(self, pwd: str) -> None:
         self.pwd: str = pwd
@@ -78,12 +78,13 @@ class ServerRCON:
     def command(self, comm: str) -> tuple[bool, str]:
         try:
             with Client(ServerRCON.HOST, ServerRCON.PORT, passwd=self.pwd, timeout=ServerRCON.TIMEOUT) as client:
-                return False, client.run(comm)
+                return True, client.run(comm)
         except Exception as e:
-            return True, f"RCON error: {str(e)}"
+            return False, f"RCON error: {str(e)}"
 
 class ServerCntl:
     PROC_TIMEOUT = 5
+    COMM_MAXLEN = 256
     STOP_COMMAND = b"/stop\n"
 
     def __init__(self, script: str, rcon_pwd: str) -> None:
@@ -152,6 +153,15 @@ class ServerCntl:
             return not self._inst.poll() is None
 
     def command(self, comm: str) -> tuple[bool, str]:
+        if not comm.strip() or len(comm) > 256:
+            return False, "invalid command format"
+                            
+        illegal_comms = ["/stop"]
+
+        for icomm in illegal_comms:
+            if icomm in comm.lower():
+                return False, f"command {icomm} not allowed"
+
         return self._rcon.command(comm)
 
 class ServerManager(discord.Client):
