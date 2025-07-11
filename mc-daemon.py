@@ -177,6 +177,7 @@ class ServerManager(discord.Client):
         self.tree = app_commands.CommandTree(self)
 
     async def setup_hook(self) -> None:
+        self.tree.copy_global_to(guild=self.env.guild)
         await self.tree.sync(guild=self.env.guild)
 
     async def autoshutdown_wait(self) -> None:
@@ -211,6 +212,11 @@ intents=discord.Intents.default()
 intents.message_content = True
 
 bot = ServerManager(ServerEnv(), intents=intents)
+
+@bot.event
+async def on_ready():
+    print(f'Logged in as {bot.user} (ID: {bot.user.id})')
+    print('------')
 
 @bot.tree.command(name="help", description="Consulta los comandos disponibles")
 async def help(inter: discord.Interaction):
