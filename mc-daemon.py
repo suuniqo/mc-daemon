@@ -175,7 +175,7 @@ class ServerManager(discord.Client):
         self.blocked = False
         self.tree = app_commands.CommandTree(self)
 
-    async def setup_hook(self) -> None:
+    async def on_ready(self) -> None:
         await self.tree.sync()
 
     async def autoshutdown_wait(self) -> None:
