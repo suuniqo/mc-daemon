@@ -336,4 +336,4 @@ async def inject(inter: discord.Interaction, comm: str) -> None:
         
 
 
-bot.run(env.token)
+bot.run(bot.env.token)
