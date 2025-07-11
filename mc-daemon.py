@@ -326,9 +326,9 @@ async def inject(inter: discord.Interaction, comm: str) -> None:
 
     await inter.response.defer()
 
-    err, resp = mng.cntl.command(comm)
+    success, resp = mng.cntl.command(comm)
 
-    if not err:
+    if success:
         await inter.followup.send(
                 f"✅ El comando se ejecuto correctamente:\n"
                 f"`{resp}`"
