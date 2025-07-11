@@ -167,16 +167,17 @@ class ServerCntl:
 class ServerManager(discord.Client):
     EMPTY_SERVER_TIMEOUT = 60 * 5
 
-    def __init__(self, startup_script: str, rcon_pwd: str, *, intents: discord.Intents) -> None:
+    def __init__(self, env: ServerEnv, *, intents: discord.Intents) -> None:
         super().__init__(intents=intents)
 
-        self.cntl = ServerCntl(startup_script, rcon_pwd)
+        self.env = env
+        self.cntl = ServerCntl(env.script, env.rconpwd)
         self.stamp = None
         self.blocked = False
         self.tree = app_commands.CommandTree(self)
 
     async def on_ready(self) -> None:
-        await self.tree.sync()
+        await self.tree.sync(guild=env.guild)
 
     async def autoshutdown_wait(self) -> None:
         while not self._autoshutdown.is_running():
@@ -209,11 +210,8 @@ class ServerManager(discord.Client):
 intents=discord.Intents.default()
 intents.message_content = True
 
-env = ServerEnv()
-bot = ServerManager(env.script, env.rconpwd, intents=intents)
+bot = ServerManager(ServerEnv(), intents=intents)
 
-@app_commands.guild_only()
-@app_commands.guilds(env.guild)
 @bot.tree.command(name="help", description="Consulta los comandos disponibles")
 async def help(inter: discord.Interaction):
     await inter.response.send_message(
@@ -225,8 +223,6 @@ async def help(inter: discord.Interaction):
             "- `/inject` Ejecuta un comando el server (admin)"
             )
 
-@app_commands.guild_only()
-@app_commands.guilds(env.guild)
 @bot.tree.command(name="start", description="Intenta iniciar el server")
 async def start(inter: discord.Interaction) -> None:
     mng = cast(ServerManager, inter.client)
@@ -252,8 +248,6 @@ async def start(inter: discord.Interaction) -> None:
         case ServerStatus.CLOSED:
             await inter.response.send_message(f"❌ Inténtalo de nuevo porfavor")
 
-@app_commands.guild_only()
-@app_commands.guilds(env.guild)
 @bot.tree.command(name="status", description="Muestra el status del server")
 async def status(inter: discord.Interaction) -> None:
     mng = cast(ServerManager, inter.client)
@@ -275,8 +269,6 @@ async def status(inter: discord.Interaction) -> None:
     else:
         await inter.response.send_message(f"📊 El server está {status}.")
 
-@app_commands.guild_only()
-@app_commands.guilds(env.guild)
 @app_commands.default_permissions(discord.Permissions(administrator=True))
 @bot.tree.command(name="lock", description="Apaga y bloquea el server")
 async def lock(inter: discord.Interaction) -> None:
@@ -302,8 +294,6 @@ async def lock(inter: discord.Interaction) -> None:
 
     await inter.followup.send(f"🔒 El server ha sido bloqueado.")
 
-@app_commands.guild_only()
-@app_commands.guilds(env.guild)
 @app_commands.default_permissions(discord.Permissions(administrator=True))
 @bot.tree.command(name="unlock", description="Desbloquea el server")
 async def unlock(inter: discord.Interaction) -> None:
@@ -316,8 +306,6 @@ async def unlock(inter: discord.Interaction) -> None:
     mng.blocked = False
     await inter.response.send_message(f"🔓 El server ha sido desbloqueado.")
 
-@app_commands.guild_only()
-@app_commands.guilds(env.guild)
 @app_commands.rename(comm="command")
 @app_commands.describe(comm="Comando a ejecutar.")
 @app_commands.default_permissions(discord.Permissions(administrator=True))
