@@ -10,7 +10,7 @@ from mcipc.rcon.je import Client
 from typing import cast, Optional
 from enum import Enum
 from dotenv import load_dotenv
-from discord import app_commands, guild
+from discord import app_commands
 from discord.ext import tasks
 
 class ServerEnv:
@@ -99,18 +99,17 @@ class ServerCntl:
     STOP_COMMAND = b"/stop\n"
 
     def __init__(self, script: str) -> None:
-        self._status: ServerStatus = ServerStatus.CLOSED
+        self.status: ServerStatus = ServerStatus.CLOSED
+        self.locked: bool = False
+
         self._inst: Optional[subprocess.Popen[bytes]] = None
         self._script: str = script
 
-    def status(self) -> ServerStatus:
-        return self._status
-
     def try_start(self) -> bool:
-        if not self._inst is None or self._status != ServerStatus.CLOSED:
+        if not self._inst is None or self.status != ServerStatus.CLOSED:
                 return False
 
-        self._status = ServerStatus.OPENING
+        self.status = ServerStatus.OPENING
         self._inst = subprocess.Popen(
                 self._script,
                 stdin=subprocess.PIPE,
@@ -119,16 +118,16 @@ class ServerCntl:
         )
         return True
 
-    def try_stop(self):
-        if self._inst is None or self._status != ServerStatus.OPEN or self._inst.stdin is None:
+    def try_stop(self) -> None:
+        if self._inst is None or self.status != ServerStatus.OPEN or self._inst.stdin is None:
             return
 
         if not self._inst.poll() is None:
             self._inst = None
-            self._status = ServerStatus.CLOSED
+            self.status = ServerStatus.CLOSED
             return
 
-        self._status = ServerStatus.CLOSING
+        self.status = ServerStatus.CLOSING
 
         try:
             self._inst.communicate(input=ServerCntl.STOP_COMMAND, timeout=ServerCntl.PROC_TIMEOUT)
@@ -141,18 +140,18 @@ class ServerCntl:
             self._inst.kill()
 
         self._inst = None
-        self._status = ServerStatus.CLOSED
+        self.status = ServerStatus.CLOSED
         return
 
     async def wait_open(self) -> bool:
         while not ServerConn.is_open():
             if self.crashed():
                 self._inst = None
-                self._status = ServerStatus.CLOSED
+                self.status = ServerStatus.CLOSED
                 return False
             await asyncio.sleep(1)
 
-        self._status = ServerStatus.OPEN
+        self.status = ServerStatus.OPEN
         return True
 
     def crashed(self) -> bool:
@@ -160,23 +159,10 @@ class ServerCntl:
             return False
         return not self._inst.poll() is None
 
-class ServerManager(discord.Client):
-    EMPTY_SERVER_TIMEOUT = 60 * 5
-
-    def __init__(self, env: ServerEnv, *, intents: discord.Intents) -> None:
-        super().__init__(intents=intents)
-
-        self.conf = ServerConf(env.token, env.guild)
-        self.cntl = ServerCntl(env.script)
-        self.rcon = ServerRCON(env.rconpwd)
-
-        self.locked = False
-        self.stamp = None
-
-        self.tree = app_commands.CommandTree(self)
-
-    async def setup_hook(self) -> None:
-        await self.tree.sync()
+class ServerMntr:
+    def __init__(self, cntl: ServerCntl) -> None:
+        self.stamp: Optional[float] = None
+        self._cntl: ServerCntl = cntl
 
     async def autoshutdown_wait(self) -> None:
         while not self._autoshutdown.is_running():
@@ -192,7 +178,7 @@ class ServerManager(discord.Client):
 
     @tasks.loop(minutes=1)
     async def _autoshutdown(self) -> None:
-        status = self.cntl.status()
+        status = self._cntl.status
 
         if status != ServerStatus.OPEN or not ServerConn.is_empty():
             self.stamp = None
@@ -200,19 +186,36 @@ class ServerManager(discord.Client):
 
         if self.stamp == None:
             self.stamp = time.time()
-        elif self.cntl.crashed():
-            self.cntl.try_stop()
+        elif self._cntl.crashed():
+            self._cntl.try_stop()
             
-            if not self.locked and self.cntl.try_start() and await self.cntl.wait_open():
+            if not self._cntl.locked and self._cntl.try_start() and await self._cntl.wait_open():
                 self.stamp = None
                 return
 
             self._autoshutdown.stop()
             self.stamp = None
-        elif time.time() - self.stamp >= ServerManager.EMPTY_SERVER_TIMEOUT or self.cntl.crashed():
-            self.cntl.try_stop()
+        elif time.time() - self.stamp >= ServerManager.EMPTY_SERVER_TIMEOUT or self._cntl.crashed():
+            self._cntl.try_stop()
             self._autoshutdown.stop()
             self.stamp = None
+
+class ServerManager(discord.Client):
+    EMPTY_SERVER_TIMEOUT = 60 * 5
+
+    def __init__(self, env: ServerEnv, *, intents: discord.Intents) -> None:
+        super().__init__(intents=intents)
+
+        self.conf = ServerConf(env.token, env.guild)
+        self.cntl = ServerCntl(env.script)
+        self.rcon = ServerRCON(env.rconpwd)
+        self.mntr = ServerMntr(self.cntl)
+
+        self.tree = app_commands.CommandTree(self)
+
+    async def setup_hook(self) -> None:
+        await self.tree.sync()
+        await self.tree.sync(guild=self.conf.guild)
 
 def make_bot():
     intents=discord.Intents.default()
@@ -221,10 +224,6 @@ def make_bot():
     return ServerManager(ServerEnv(), intents=intents)
 
 bot = make_bot()
-
-@bot.event
-async def on_ready() -> None:
-    await bot.tree.sync()
 
 @bot.tree.command(name="help", description="View available commands")
 async def help(inter: discord.Interaction):
@@ -246,7 +245,7 @@ async def help(inter: discord.Interaction):
 async def start(inter: discord.Interaction) -> None:
     mng = cast(ServerManager, inter.client)
 
-    if mng.locked:
+    if mng.cntl.locked:
         embed = discord.Embed(
             title="The server has been locked by admins ❌",
             color=discord.Color.red()
@@ -267,7 +266,7 @@ async def start(inter: discord.Interaction) -> None:
             )
             await inter.response.send_message(embed=embed)
 
-        mng.autoshutdown_start()
+        mng.mntr.autoshutdown_start()
 
         embed = discord.Embed(
             title=f"The server is ready ✅",
@@ -279,7 +278,7 @@ async def start(inter: discord.Interaction) -> None:
 
         return
 
-    status = mng.cntl.status()
+    status = mng.cntl.status
 
     embed = None
 
@@ -306,8 +305,8 @@ async def start(inter: discord.Interaction) -> None:
 async def status(inter: discord.Interaction) -> None:
     mng = cast(ServerManager, inter.client)
 
-    status = mng.cntl.status()
-    stamp = mng.stamp
+    status = mng.cntl.status
+    stamp = mng.mntr.stamp
     
     if status == ServerStatus.OPEN and stamp != None:
         elapsed = time.time() - stamp
@@ -337,7 +336,7 @@ async def status(inter: discord.Interaction) -> None:
 async def lock(inter: discord.Interaction) -> None:
     mng = cast(ServerManager, inter.client)
 
-    if mng.locked:
+    if mng.cntl.locked:
         embed = discord.Embed(
             title="The server was already locked ✅",
             color=discord.Color.green()
@@ -345,19 +344,19 @@ async def lock(inter: discord.Interaction) -> None:
         await inter.response.send_message(embed=embed)
         return
 
-    mng.locked = True
+    mng.cntl.locked = True
 
     await inter.response.defer()
 
-    status = mng.cntl.status()
+    status = mng.cntl.status
 
     if status == ServerStatus.OPEN:
         mng.cntl.try_stop()
-        mng.autoshutdown_stop()
+        mng.mntr.autoshutdown_stop()
     elif status == ServerStatus.OPENING:
-        await mng.autoshutdown_wait()
+        await mng.mntr.autoshutdown_wait()
         mng.cntl.try_stop()
-        mng.autoshutdown_stop()
+        mng.mntr.autoshutdown_stop()
 
     embed = discord.Embed(
         title="The server has been locked 🔒",
@@ -374,13 +373,13 @@ async def unlock(inter: discord.Interaction) -> None:
 
     embed = None
 
-    if not mng.locked:
+    if not mng.cntl.locked:
         embed = discord.Embed(
             title="The server was already unlocked ✅",
             color=discord.Color.green()
         )
     else:
-        mng.locked = False
+        mng.cntl.locked = False
         embed = discord.Embed(
             title="The server has been unlocked 🔓",
             color=discord.Color.yellow()
@@ -397,7 +396,7 @@ async def unlock(inter: discord.Interaction) -> None:
 async def inject(inter: discord.Interaction, comm: str) -> None:
     mng = cast(ServerManager, inter.client)
 
-    status = mng.cntl.status()
+    status = mng.cntl.status
 
     if status != ServerStatus.OPEN:
         embed = discord.Embed(
