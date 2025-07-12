@@ -1,18 +1,32 @@
 import os
 import sys
 import discord
-import threading
 import subprocess
 import time
 import psutil
 import asyncio
-from mcipc.rcon.je import Client
 
+from mcipc.rcon.je import Client
 from typing import cast, Optional
 from enum import Enum
 from dotenv import load_dotenv
 from discord import app_commands
 from discord.ext import tasks
+
+class ServerEnv:
+    ENVNAME_SCRIPT = "STARTUP_SCRIPT"
+    ENVNAME_TOKEN = "DISCORD_TOKEN"
+    ENVNAME_GUILD = "GUILD_ID"
+    ENVNAME_RCONPWD = "RCON_PASSWORD"
+
+    def __init__(self) -> None:
+        try_fetch = lambda envname: os.getenv(envname) or sys.exit(f"couldn't fetch {envname} from .env")
+
+        load_dotenv()
+        self.token: str = try_fetch(ServerEnv.ENVNAME_TOKEN)
+        self.script: str = try_fetch(ServerEnv.ENVNAME_SCRIPT)
+        self.guild: int = int(try_fetch(ServerEnv.ENVNAME_GUILD))
+        self.rconpwd: str = try_fetch(ServerEnv.ENVNAME_RCONPWD)
 
 class ServerStatus(Enum):
     CLOSED = 0
@@ -52,32 +66,29 @@ class ServerConn:
                 return True
         return False
 
-class ServerEnv:
-    ENVNAME_SCRIPT = "STARTUP_SCRIPT"
-    ENVNAME_TOKEN = "DISCORD_TOKEN"
-    ENVNAME_GUILD = "GUILD_ID"
-    ENVNAME_RCONPWD = "RCON_PASSWORD"
-
-    def __init__(self) -> None:
-        try_fetch = lambda envname: os.getenv(envname) or sys.exit(f"couldn't fetch {envname} from .env")
-
-        load_dotenv()
-        self.token: str = try_fetch(ServerEnv.ENVNAME_TOKEN)
-        self.script: str = try_fetch(ServerEnv.ENVNAME_SCRIPT)
-        self.guild: discord.Object = discord.Object(int(try_fetch(ServerEnv.ENVNAME_GUILD)))
-        self.rconpwd: str = try_fetch(ServerEnv.ENVNAME_RCONPWD)
+class ServerConf:
+    def __init__(self, token: str, guild: int) -> None:
+        self.token: str = token
+        self.guild: discord.Object = discord.Object(guild)
 
 class ServerRCON:
     PORT = 25575
     HOST = "127.0.0.1"
     TIMEOUT = 15
+    ILLEGAL_COMMS = ["/stop"]
 
     def __init__(self, pwd: str) -> None:
-        self.pwd: str = pwd
+        self._pwd: str = pwd
 
     def command(self, comm: str) -> tuple[bool, str]:
+        if not comm.strip() or len(comm) > 256:
+            return False, "invalid command format"
+                            
+        for icomm in ServerRCON.ILLEGAL_COMMS:
+            if icomm in comm.lower():
+                return False, f"command {icomm} not allowed"
         try:
-            with Client(ServerRCON.HOST, ServerRCON.PORT, passwd=self.pwd, timeout=ServerRCON.TIMEOUT) as client:
+            with Client(ServerRCON.HOST, ServerRCON.PORT, passwd=self._pwd, timeout=ServerRCON.TIMEOUT) as client:
                 return True, client.run(comm)
         except Exception as e:
             return False, f"RCON error: {str(e)}"
@@ -87,82 +98,67 @@ class ServerCntl:
     COMM_MAXLEN = 256
     STOP_COMMAND = b"/stop\n"
 
-    def __init__(self, script: str, rcon_pwd: str) -> None:
-        self._rcon: ServerRCON = ServerRCON(rcon_pwd)
-        self._lock: threading.Lock = threading.Lock()
+    def __init__(self, script: str) -> None:
         self._status: ServerStatus = ServerStatus.CLOSED
         self._inst: Optional[subprocess.Popen[bytes]] = None
         self._script: str = script
 
     def status(self) -> ServerStatus:
-        with self._lock:
-            return self._status
+        return self._status
 
     def try_start(self) -> bool:
-        with self._lock:
-            if not self._inst is None or self._status != ServerStatus.CLOSED:
+        if not self._inst is None or self._status != ServerStatus.CLOSED:
                 return False
 
-            self._status = ServerStatus.OPENING
-            self._inst = subprocess.Popen(
-                    self._script,
-                    stdin=subprocess.PIPE,
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL
-            )
-            return True
+        self._status = ServerStatus.OPENING
+        self._inst = subprocess.Popen(
+                self._script,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+        )
+        return True
 
     def try_stop(self):
-        with self._lock:
-            if self._inst is None or self._status != ServerStatus.OPEN or self._inst.stdin is None:
-                return
-
-            if not self._inst.poll() is None:
-                self._inst = None
-                self._status = ServerStatus.CLOSED
-                return
-
-            self._status = ServerStatus.CLOSING
-
-            try:
-                self._inst.communicate(input=ServerCntl.STOP_COMMAND, timeout=ServerCntl.PROC_TIMEOUT)
-            except subprocess.TimeoutExpired:
-                self._inst.kill()
-
-            try:
-                self._inst.wait(timeout=ServerCntl.PROC_TIMEOUT)
-            except subprocess.TimeoutExpired:
-                self._inst.kill()
-
-            self._inst = None
-            self._status = ServerStatus.CLOSED
-
+        if self._inst is None or self._status != ServerStatus.OPEN or self._inst.stdin is None:
             return
 
-    def wait_open(self) -> None:
-        while not ServerConn.is_open():
-            time.sleep(1)
+        if not self._inst.poll() is None:
+            self._inst = None
+            self._status = ServerStatus.CLOSED
+            return
 
-        with self._lock:
-            self._status = ServerStatus.OPEN
+        self._status = ServerStatus.CLOSING
+
+        try:
+            self._inst.communicate(input=ServerCntl.STOP_COMMAND, timeout=ServerCntl.PROC_TIMEOUT)
+        except subprocess.TimeoutExpired:
+            self._inst.kill()
+
+        try:
+            self._inst.wait(timeout=ServerCntl.PROC_TIMEOUT)
+        except subprocess.TimeoutExpired:
+            self._inst.kill()
+
+        self._inst = None
+        self._status = ServerStatus.CLOSED
+        return
+
+    async def wait_open(self) -> bool:
+        while not ServerConn.is_open():
+            if self.crashed():
+                self._inst = None
+                self._status = ServerStatus.CLOSED
+                return False
+            await asyncio.sleep(1)
+
+        self._status = ServerStatus.OPEN
+        return True
 
     def crashed(self) -> bool:
-        with self._lock:
-            if self._inst is None:
-                return False
-            return not self._inst.poll() is None
-
-    def command(self, comm: str) -> tuple[bool, str]:
-        if not comm.strip() or len(comm) > 256:
-            return False, "invalid command format"
-                            
-        illegal_comms = ["/stop"]
-
-        for icomm in illegal_comms:
-            if icomm in comm.lower():
-                return False, f"command {icomm} not allowed"
-
-        return self._rcon.command(comm)
+        if self._inst is None:
+            return False
+        return not self._inst.poll() is None
 
 class ServerManager(discord.Client):
     EMPTY_SERVER_TIMEOUT = 60 * 5
@@ -170,14 +166,17 @@ class ServerManager(discord.Client):
     def __init__(self, env: ServerEnv, *, intents: discord.Intents) -> None:
         super().__init__(intents=intents)
 
-        self.env = env
-        self.cntl = ServerCntl(env.script, env.rconpwd)
-        self.stamp = None
+        self.conf = ServerConf(env.token, env.guild)
+        self.cntl = ServerCntl(env.script)
+        self.rcon = ServerRCON(env.rconpwd)
+
         self.locked = False
+        self.stamp = None
+
         self.tree = app_commands.CommandTree(self)
 
     async def setup_hook(self) -> None:
-        await self.tree.sync(guild=self.env.guild)
+        await self.tree.sync(guild=self.conf.guild)
 
     async def autoshutdown_wait(self) -> None:
         while not self._autoshutdown.is_running():
@@ -201,20 +200,27 @@ class ServerManager(discord.Client):
 
         if self.stamp == None:
             self.stamp = time.time()
+        elif self.cntl.crashed():
+            self.cntl.try_stop()
+            
+            if not self.locked and self.cntl.try_start() and await self.cntl.wait_open():
+                self.stamp = None
+                return
+
+            self._autoshutdown.stop()
+            self.stamp = None
         elif time.time() - self.stamp >= ServerManager.EMPTY_SERVER_TIMEOUT or self.cntl.crashed():
             self.cntl.try_stop()
             self._autoshutdown.stop()
             self.stamp = None
 
+def make_bot():
+    intents=discord.Intents.default()
+    intents.message_content = True
 
-intents=discord.Intents.default()
-intents.message_content = True
+    return ServerManager(ServerEnv(), intents=intents)
 
-bot = ServerManager(ServerEnv(), intents=intents)
-
-@bot.event
-async def on_ready():
-    pass
+bot = make_bot()
 
 @bot.tree.command(name="help", description="View available commands")
 async def help(inter: discord.Interaction):
@@ -226,6 +232,7 @@ async def help(inter: discord.Interaction):
             "- `/lock` Locks and closes the server (admin)\n"
             "- `/unlock` Unlocks the server (admin)\n"
             "- `/inject` Executes the provided command in the server (admin)"
+            "- `/sync` Synchronizes slash commands in the guild (owner)"
         ),
         color=discord.Color.yellow()
     )
@@ -247,7 +254,16 @@ async def start(inter: discord.Interaction) -> None:
 
     if mng.cntl.try_start():
         await inter.response.defer()
-        await asyncio.to_thread(mng.cntl.wait_open)
+        
+        opened = await mng.cntl.wait_open()
+
+        if not opened:
+            embed = discord.Embed(
+                title="The server crashed on startup ❌",
+                color=discord.Color.red()
+            )
+            await inter.response.send_message(embed=embed)
+
         mng.autoshutdown_start()
 
         embed = discord.Embed(
@@ -306,7 +322,7 @@ async def status(inter: discord.Interaction) -> None:
         await inter.response.send_message(embed=embed)
     else:
         embed = discord.Embed(
-            title=f"The server is {status}  📊",
+            title=f"The server is {status} 📊",
             color=discord.Color.blue()
         )
         await inter.response.send_message(embed=embed)
@@ -353,7 +369,7 @@ async def unlock(inter: discord.Interaction) -> None:
 
     if not mng.locked:
         embed = discord.Embed(
-            title="The server was already locked ✅",
+            title="The server was already unlocked ✅",
             color=discord.Color.green()
         )
     else:
@@ -384,7 +400,7 @@ async def inject(inter: discord.Interaction, comm: str) -> None:
 
     await inter.response.defer()
 
-    success, resp = mng.cntl.command(comm)
+    success, resp = mng.rcon.command(comm)
 
     embed = None
 
@@ -403,4 +419,28 @@ async def inject(inter: discord.Interaction, comm: str) -> None:
 
     await inter.followup.send(embed=embed)
 
-bot.run(bot.env.token)
+@app_commands.default_permissions(discord.Permissions(administrator=True))
+@bot.tree.command(name="sync", description="Synchronizes slash commands in the guild")
+async def sync(inter: discord.Interaction) -> None:
+    info = await bot.application_info()
+
+    if info.owner.id != inter.user.id:
+        embed = discord.Embed(
+            title="Can only be executed by the owner ❌",
+            color=discord.Color.red()
+        )
+        await inter.response.send_message(embed=embed)
+        return
+
+    bot.tree.clear_commands(guild=bot.conf.guild)
+    bot.tree.copy_global_to(guild=bot.conf.guild)
+
+    await bot.tree.sync(guild=bot.conf.guild)
+
+    embed = discord.Embed(
+        title="The synchronization was successful ✅",
+        color=discord.Color.green()
+    )
+    await inter.response.send_message(embed=embed)
+
+bot.run(bot.conf.token)
