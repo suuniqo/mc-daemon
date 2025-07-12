@@ -177,7 +177,7 @@ class ServerManager(discord.Client):
 
     async def setup_hook(self) -> None:
         self.tree.copy_global_to(guild=self.conf.guild)
-        await self.tree.sync()
+        await self.tree.sync(guild=self.conf.guild)
 
     async def autoshutdown_wait(self) -> None:
         while not self._autoshutdown.is_running():
