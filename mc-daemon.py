@@ -234,6 +234,7 @@ async def help(inter: discord.Interaction):
             "- `/lock` Locks and closes the server (admin)\n"
             "- `/unlock` Unlocks the server (admin)\n"
             "- `/inject` Executes the provided command in the server (admin)"
+            "- testing"
         ),
         color=discord.Color.yellow()
     )
