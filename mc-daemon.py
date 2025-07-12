@@ -175,10 +175,6 @@ class ServerManager(discord.Client):
 
         self.tree = app_commands.CommandTree(self)
 
-    async def setup_hook(self) -> None:
-        self.tree.copy_global_to(guild=self.conf.guild)
-        await self.tree.sync(guild=self.conf.guild)
-
     async def autoshutdown_wait(self) -> None:
         while not self._autoshutdown.is_running():
             await asyncio.sleep(1)
@@ -222,6 +218,12 @@ def make_bot():
     return ServerManager(ServerEnv(), intents=intents)
 
 bot = make_bot()
+
+@bot.event
+async def on_ready(self) -> None:
+    self.tree.copy_global_to(guild=self.conf.guild)
+    await self.tree.sync(guild=self.conf.guild)
+
 
 @bot.tree.command(name="help", description="View available commands")
 async def help(inter: discord.Interaction):
