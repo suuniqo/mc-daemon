@@ -176,6 +176,7 @@ class ServerManager(discord.Client):
         self.tree = app_commands.CommandTree(self)
 
     async def setup_hook(self) -> None:
+        self.tree.clear_commands(guild=self.conf.guild)
         self.tree.copy_global_to(guild=self.conf.guild)
         await self.tree.sync(guild=self.conf.guild)
 
@@ -233,7 +234,6 @@ async def help(inter: discord.Interaction):
             "- `/lock` Locks and closes the server (admin)\n"
             "- `/unlock` Unlocks the server (admin)\n"
             "- `/inject` Executes the provided command in the server (admin)"
-            "- `/sync` Synchronizes slash commands in the guild (owner)"
         ),
         color=discord.Color.yellow()
     )
@@ -419,29 +419,5 @@ async def inject(inter: discord.Interaction, comm: str) -> None:
         )
 
     await inter.followup.send(embed=embed)
-
-@app_commands.default_permissions(discord.Permissions(administrator=True))
-@bot.tree.command(name="sync", description="Synchronizes slash commands in the guild")
-async def sync(inter: discord.Interaction) -> None:
-    info = await bot.application_info()
-
-    if info.owner.id != inter.user.id:
-        embed = discord.Embed(
-            title="Can only be executed by the owner ❌",
-            color=discord.Color.red()
-        )
-        await inter.response.send_message(embed=embed)
-        return
-
-    bot.tree.clear_commands(guild=bot.conf.guild)
-    bot.tree.copy_global_to(guild=bot.conf.guild)
-
-    await bot.tree.sync(guild=bot.conf.guild)
-
-    embed = discord.Embed(
-        title="The synchronization was successful ✅",
-        color=discord.Color.green()
-    )
-    await inter.response.send_message(embed=embed)
 
 bot.run(bot.conf.token)
