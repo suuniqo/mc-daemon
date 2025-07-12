@@ -234,7 +234,6 @@ async def help(inter: discord.Interaction):
             "- `/lock` Locks and closes the server (admin)\n"
             "- `/unlock` Unlocks the server (admin)\n"
             "- `/inject` Executes the provided command in the server (admin)"
-            "- testing"
         ),
         color=discord.Color.yellow()
     )
@@ -330,8 +329,6 @@ async def status(inter: discord.Interaction) -> None:
         await inter.response.send_message(embed=embed)
 
 @bot.tree.command(name="lock", description="Locks and closes the server")
-@app_commands.guild_only()
-@app_commands.guilds(bot.conf.guild)
 @app_commands.default_permissions(discord.Permissions(administrator=True))
 async def lock(inter: discord.Interaction) -> None:
     mng = cast(ServerManager, inter.client)
@@ -365,8 +362,6 @@ async def lock(inter: discord.Interaction) -> None:
     await inter.followup.send(embed=embed)
 
 @bot.tree.command(name="unlock", description="Unlocks the server")
-@app_commands.guild_only()
-@app_commands.guilds(bot.conf.guild)
 @app_commands.default_permissions(discord.Permissions(administrator=True))
 async def unlock(inter: discord.Interaction) -> None:
     mng = cast(ServerManager, inter.client)
@@ -388,8 +383,6 @@ async def unlock(inter: discord.Interaction) -> None:
     await inter.response.send_message(embed=embed)
 
 @bot.tree.command(name="inject", description="Executes the provided command in the server")
-@app_commands.guild_only()
-@app_commands.guilds(bot.conf.guild)
 @app_commands.rename(comm="command")
 @app_commands.describe(comm="Command to execute")
 @app_commands.default_permissions(discord.Permissions(administrator=True))
