@@ -10,7 +10,7 @@ from mcipc.rcon.je import Client
 from typing import cast, Optional
 from enum import Enum
 from dotenv import load_dotenv
-from discord import app_commands, guild
+from discord import app_commands
 from discord.ext import tasks
 
 class ServerEnv:
@@ -176,7 +176,6 @@ class ServerManager(discord.Client):
         self.tree = app_commands.CommandTree(self)
 
     async def setup_hook(self) -> None:
-        self.tree.copy_global_to(guild=self.conf.guild)
         self.tree.clear_commands(guild=self.conf.guild)
         await self.tree.sync(guild=self.conf.guild)
 
