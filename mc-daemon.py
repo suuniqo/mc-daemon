@@ -221,8 +221,8 @@ bot = make_bot()
 
 @bot.event
 async def on_ready(self) -> None:
-    self.tree.copy_global_to(guild=self.conf.guild)
-    await self.tree.sync(guild=self.conf.guild)
+    self.tree.copy_global_to()
+    await self.tree.sync()
 
 
 @bot.tree.command(name="help", description="View available commands")
