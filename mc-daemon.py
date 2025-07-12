@@ -221,6 +221,7 @@ bot = make_bot()
 
 @bot.event
 async def on_ready() -> None:
+    await bot.tree.sync()
     bot.tree.clear_commands(guild=bot.conf.guild)
     await bot.tree.sync(guild=bot.conf.guild)
 
@@ -329,6 +330,9 @@ async def status(inter: discord.Interaction) -> None:
         await inter.response.send_message(embed=embed)
 
 @bot.tree.command(name="lock", description="Locks and closes the server")
+@app_commands.guild_only()
+@app_commands.guilds(bot.conf.guild)
+@app_commands.default_permissions(discord.Permissions(administrator=True))
 async def lock(inter: discord.Interaction) -> None:
     mng = cast(ServerManager, inter.client)
 
@@ -361,6 +365,9 @@ async def lock(inter: discord.Interaction) -> None:
     await inter.followup.send(embed=embed)
 
 @bot.tree.command(name="unlock", description="Unlocks the server")
+@app_commands.guild_only()
+@app_commands.guilds(bot.conf.guild)
+@app_commands.default_permissions(discord.Permissions(administrator=True))
 async def unlock(inter: discord.Interaction) -> None:
     mng = cast(ServerManager, inter.client)
 
@@ -381,8 +388,11 @@ async def unlock(inter: discord.Interaction) -> None:
     await inter.response.send_message(embed=embed)
 
 @bot.tree.command(name="inject", description="Executes the provided command in the server")
+@app_commands.guild_only()
+@app_commands.guilds(bot.conf.guild)
 @app_commands.rename(comm="command")
 @app_commands.describe(comm="Command to execute")
+@app_commands.default_permissions(discord.Permissions(administrator=True))
 async def inject(inter: discord.Interaction, comm: str) -> None:
     mng = cast(ServerManager, inter.client)
 
