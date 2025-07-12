@@ -221,6 +221,7 @@ bot = make_bot()
 
 @bot.event
 async def on_ready() -> None:
+    bot.tree.clear_commands(guild=None)
     await bot.tree.sync()
     bot.tree.clear_commands(guild=bot.conf.guild)
     await bot.tree.sync(guild=bot.conf.guild)
