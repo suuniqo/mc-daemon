@@ -329,6 +329,7 @@ async def status(inter: discord.Interaction) -> None:
         )
         await inter.response.send_message(embed=embed)
 
+@app_commands.guilds(bot.conf.guild)
 @app_commands.default_permissions(discord.Permissions(administrator=True))
 @bot.tree.command(name="lock", description="Locks and closes the server")
 async def lock(inter: discord.Interaction) -> None:
@@ -362,6 +363,7 @@ async def lock(inter: discord.Interaction) -> None:
     )
     await inter.followup.send(embed=embed)
 
+@app_commands.guilds(bot.conf.guild)
 @app_commands.default_permissions(discord.Permissions(administrator=True))
 @bot.tree.command(name="unlock", description="Unlocks the server")
 async def unlock(inter: discord.Interaction) -> None:
@@ -383,6 +385,7 @@ async def unlock(inter: discord.Interaction) -> None:
 
     await inter.response.send_message(embed=embed)
 
+@app_commands.guilds(bot.conf.guild)
 @app_commands.rename(comm="command")
 @app_commands.describe(comm="Command to execute")
 @app_commands.default_permissions(discord.Permissions(administrator=True))
