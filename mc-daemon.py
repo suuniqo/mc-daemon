@@ -7,7 +7,7 @@ import psutil
 import asyncio
 
 from mcipc.rcon.je import Client
-from typing import cast, Optional
+from typing import cast, Optional, Self
 from enum import Enum
 from dotenv import load_dotenv
 from discord import app_commands
@@ -217,13 +217,14 @@ class ServerManager(discord.Client):
         await self.tree.sync()
         await self.tree.sync(guild=self.conf.guild)
 
-def make_bot():
-    intents=discord.Intents.default()
-    intents.message_content = True
+    @classmethod
+    def make(cls) -> Self:
+        intents=discord.Intents.default()
+        intents.message_content = True
 
-    return ServerManager(ServerEnv(), intents=intents)
+        return cls(ServerEnv(), intents=intents)
 
-bot = make_bot()
+bot = ServerManager.make()
 
 @bot.tree.command(name="help", description="View available commands")
 async def help(inter: discord.Interaction):
