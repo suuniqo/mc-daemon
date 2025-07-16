@@ -19,14 +19,16 @@ class ServerEnv:
     ENVNAME_GUILD = "GUILD_ID"
     ENVNAME_RCONPWD = "RCON_PASSWORD"
 
-    def __init__(self) -> None:
-        try_fetch = lambda envname: os.getenv(envname) or sys.exit(f"couldn't fetch {envname} from .env")
+    @staticmethod
+    def _try_fetch(envname: str) -> str:
+        return os.getenv(envname) or sys.exit(f"couldn't fetch {envname} from .env")
 
+    def __init__(self) -> None:
         load_dotenv()
-        self.token: str = try_fetch(ServerEnv.ENVNAME_TOKEN)
-        self.script: str = try_fetch(ServerEnv.ENVNAME_SCRIPT)
-        self.guild: int = int(try_fetch(ServerEnv.ENVNAME_GUILD))
-        self.rconpwd: str = try_fetch(ServerEnv.ENVNAME_RCONPWD)
+        self.token: str = ServerEnv._try_fetch(ServerEnv.ENVNAME_TOKEN)
+        self.script: str = ServerEnv._try_fetch(ServerEnv.ENVNAME_SCRIPT)
+        self.guild: int = int(ServerEnv._try_fetch(ServerEnv.ENVNAME_GUILD))
+        self.rconpwd: str = ServerEnv._try_fetch(ServerEnv.ENVNAME_RCONPWD)
 
 class ServerStatus(Enum):
     CLOSED = 0
@@ -228,7 +230,7 @@ bot = ServerManager.make()
 
 @bot.tree.command(name="help", description="View available commands")
 async def help(inter: discord.Interaction):
-    embed = discord.Embed(
+    await inter.response.send_message(embed=discord.Embed(
         title="Available commands 📋",
         description=(
             "- `/start` Tries to start the server\n"
@@ -238,21 +240,17 @@ async def help(inter: discord.Interaction):
             "- `/inject` Executes the provided command in the server (admin)"
         ),
         color=discord.Color.yellow()
-    )
-
-    await inter.response.send_message(embed=embed)
+    ))
 
 @bot.tree.command(name="start", description="Tries to start the server")
 async def start(inter: discord.Interaction) -> None:
     mng = cast(ServerManager, inter.client)
 
     if mng.cntl.locked:
-        embed = discord.Embed(
+        await inter.response.send_message(embed=discord.Embed(
             title="The server has been locked by admins ❌",
             color=discord.Color.red()
-        )
-
-        await inter.response.send_message(embed=embed)
+        ))
         return
 
     if mng.cntl.try_start():
@@ -261,21 +259,18 @@ async def start(inter: discord.Interaction) -> None:
         opened = await mng.cntl.wait_open()
 
         if not opened:
-            embed = discord.Embed(
+            await inter.response.send_message(embed=discord.Embed(
                 title="The server crashed on startup ❌",
                 color=discord.Color.red()
-            )
-            await inter.response.send_message(embed=embed)
+            ))
 
         mng.mntr.autoshutdown_start()
 
-        embed = discord.Embed(
+        await inter.followup.send(embed=discord.Embed(
             title=f"The server is ready ✅",
-            description=f"You can join now {inter.user.mention}!",
+            description=f"You can join now {inter.user.mention}",
             color=discord.Color.green()
-        )
-
-        await inter.followup.send(embed=embed)
+        ))
 
         return
 
@@ -316,19 +311,16 @@ async def status(inter: discord.Interaction) -> None:
         mins = int(remaining // 60)
         secs = int(remaining % 60)
 
-        embed = discord.Embed(
+        await inter.response.send_message(embed=discord.Embed(
             title=f"The server is {status} but empty ⚠️",
             description=f"It will close in {mins} minutes and {secs} seconds if nobody joins",
             color=discord.Color.yellow(),
-        )
-
-        await inter.response.send_message(embed=embed)
+        ))
     else:
-        embed = discord.Embed(
+        await inter.response.send_message(embed=discord.Embed(
             title=f"The server is {status} 📊",
             color=discord.Color.blue()
-        )
-        await inter.response.send_message(embed=embed)
+        ))
 
 @bot.tree.command(name="lock", description="Locks and closes the server")
 @app_commands.guild_only()
@@ -338,11 +330,10 @@ async def lock(inter: discord.Interaction) -> None:
     mng = cast(ServerManager, inter.client)
 
     if mng.cntl.locked:
-        embed = discord.Embed(
+        await inter.response.send_message(embed=discord.Embed(
             title="The server was already locked ✅",
             color=discord.Color.green()
-        )
-        await inter.response.send_message(embed=embed)
+        ))
         return
 
     mng.cntl.locked = True
@@ -359,11 +350,10 @@ async def lock(inter: discord.Interaction) -> None:
         mng.cntl.try_stop()
         mng.mntr.autoshutdown_stop()
 
-    embed = discord.Embed(
+    await inter.followup.send(embed=discord.Embed(
         title="The server has been locked 🔒",
         color=discord.Color.yellow()
-    )
-    await inter.followup.send(embed=embed)
+    ))
 
 @bot.tree.command(name="unlock", description="Unlocks the server")
 @app_commands.guild_only()
@@ -400,11 +390,10 @@ async def inject(inter: discord.Interaction, comm: str) -> None:
     status = mng.cntl.status
 
     if status != ServerStatus.OPEN:
-        embed = discord.Embed(
+        await inter.response.send_message(embed=discord.Embed(
             title=f"It's not posible to execute commands, the server is {status} ❌",
             color=discord.Color.red(),
-        )
-        await inter.response.send_message(embed=embed)
+        ))
         return
 
     await inter.response.defer()
