@@ -1,0 +1,2 @@
+class ServerProcErr(Exception):
+    pass

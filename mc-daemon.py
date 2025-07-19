@@ -31,8 +31,8 @@ class ServerEnv:
         self.rconpwd: str = ServerEnv._try_fetch(ServerEnv.ENVNAME_RCONPWD)
 
 class ServerStatus(Enum):
-    CLOSED = 0
-    OPEN = 1
+    CLOSED  = 0
+    OPEN    = 1
     OPENING = 2
     CLOSING = 3
 
@@ -58,6 +58,18 @@ class ServerConn:
             if conn.status == psutil.CONN_ESTABLISHED and conn.laddr.port == ServerConn.PORT:
                 return False
         return True
+
+    @staticmethod
+    def clients() -> int:
+        clients = 0
+
+        for conn in psutil.net_connections(kind='tcp'):
+            if isinstance(conn.laddr, tuple) and len(conn.laddr) == 0:
+                continue
+            if conn.status == psutil.CONN_ESTABLISHED and conn.laddr.port == ServerConn.PORT:
+                clients += 1
+                
+        return clients
 
     @staticmethod
     def is_open() -> bool:
