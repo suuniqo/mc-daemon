@@ -12,9 +12,9 @@ from .protocol import ServerConfLoader
 class EnvConfLoader(ServerConfLoader):
     ENV_DISCORD_TOKEN       = "DISCORD_TOKEN"
     ENV_DISCORD_GUILD       = "DISCORD_GUILD"
-    ENV_DISCORD_LOG_CHANNEL = "DISCORD_LOG_CHANNEL"
     ENV_PROCESS_SCRIPT      = "PROCESS_SCRIPT"
     ENV_PROCESS_TIMEOUT     = "PROCESS_TIMEOUT"
+    ENV_DISCORD_LOG_CHANNEL = "DISCORD_LOG_CHANNEL"
     ENV_MINECRAFT_PORT      = "MINECRAFT_PORT"
     ENV_RCON_PORT           = "RCON_PORT"
     ENV_RCON_PWD            = "RCON_PWD"
@@ -79,9 +79,9 @@ class EnvConfLoader(ServerConfLoader):
         return ServerConf(
             self._fetch_mandatory_as(self.ENV_DISCORD_TOKEN, str),
             self._fetch_mandatory_as(self.ENV_DISCORD_GUILD, str),
-            self._fetch_mandatory_as(self.ENV_DISCORD_LOG_CHANNEL, str),
             self._fetch_mandatory_as(self.ENV_PROCESS_SCRIPT, str),
             self._fetch_optional_as(self.ENV_PROCESS_TIMEOUT, float),
+            self._fetch_optional_as(self.ENV_DISCORD_LOG_CHANNEL, str),
             self._fetch_optional_as(self.ENV_MINECRAFT_PORT, int),
             self._fetch_optional_as(self.ENV_RCON_PORT, int),
             self._fetch_optional_as(self.ENV_RCON_PWD, str),

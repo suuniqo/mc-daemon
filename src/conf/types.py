@@ -6,9 +6,9 @@ class ServerConf:
         self,
         discord_token: str,
         discord_guild: str,
-        discord_log_channel: str,
         process_script: str,
         process_timeout: Optional[float],
+        discord_log_channel: Optional[str],
         minecraft_port: Optional[int],
         rcon_port: Optional[int],
         rcon_pwd: Optional[str],
@@ -23,11 +23,13 @@ class ServerConf:
         # discord config
         self.discord_token: str = discord_token
         self.discord_guild: str = discord_guild
-        self.discord_log_channel: str = discord_log_channel
 
         # process config
         self.process_script: str = process_script
         self.process_timeout: float = process_timeout or 4.0
+
+        # logger config
+        self.discord_log_channel: Optional[str] = discord_log_channel or None
 
         # conn config
         self.minecraft_port: int = minecraft_port or 25565
