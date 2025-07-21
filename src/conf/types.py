@@ -46,4 +46,4 @@ class ServerConf:
         self.idle_timeout: float = idle_timeout or 5.0 * 60.0
         self.polling_intv: float = polling_intv or 60.0
 
-    # TODO: post init with validation, floats cant be negative for starters!!
+    # TODO: post init with validation, floats cant be negative and mc command validation for starters!!
