@@ -8,7 +8,6 @@ class ServerEventBus:
     """
     Allows communication between classes through events
     """
-
     def __init__(self) -> None:
         self._handlers: dict[ServerEvent, list[Callable[[], None]]] = {}
         self._logger: logging.Logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")

@@ -2,12 +2,10 @@ import asyncio
 import logging
 
 from services.conn.protocol import ServerConn
+from services.conn.errors import TimeoutExpired
 
 from services.proc.protocol import ServerProc
 from services.proc.errors import ProcErr
-
-from services.wait.poller import Poller
-from services.wait.errors import TimeoutExpired
 
 from event.ebus import ServerEventBus
 from event.types import ServerEvent
@@ -98,7 +96,7 @@ class EventCntl(ServerCntl):
 
     async def wait_open(self) -> bool:
         try:
-            await Poller.wait(self._conn.is_open, self._startup_timeout)
+            await self._conn.wait_open(self._startup_timeout)
             return True
         except TimeoutExpired:
             self._logger.warning("Timeout reached opening the server")
