@@ -1,0 +1,2 @@
+class MntrErr(Exception):
+    pass

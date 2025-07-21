@@ -27,6 +27,7 @@ class EventCntl(ServerCntl):
         self._startup_timeout: float = startup_timeout
 
         self._ebus.subscribe(ServerEvent.IDLE, lambda: (self.try_close(), None)[1])
+        self._ebus.subscribe(ServerEvent.CRASHED, lambda: (self.try_restart(), None)[1])
 
     async def _handle_startup(self) -> None:
         """
@@ -47,10 +48,16 @@ class EventCntl(ServerCntl):
         return self._status
 
     def try_open(self) -> bool:
+        """
+        Tries to open the server, returns wether it has opened or not
+        Emits event 'OPENING' when starting the operation
+        """
         if self._status != ServerStatus.CLOSED:
             return False
 
         self._status = ServerStatus.OPENING
+
+        self._ebus.emit(ServerEvent.OPENING)
 
         try:
             self._proc.start()
@@ -64,12 +71,14 @@ class EventCntl(ServerCntl):
     def try_close(self) -> bool:
         """
         Tries to close the server, returns wether it has closed or not
-        Emits event 'CLOSED' if it closes correctly
+        Emits event 'CLOSING' when starting the operation and event 'CLOSED' when finished closing
         """
         if self._status != ServerStatus.OPEN:
             return False
 
         self._status = ServerStatus.CLOSING
+
+        self._ebus.emit(ServerEvent.CLOSING)
 
         try:
             self._proc.stop()
@@ -83,6 +92,9 @@ class EventCntl(ServerCntl):
         self._ebus.emit(ServerEvent.CLOSED)
 
         return True
+
+    def try_restart(self) -> bool:
+        return self.try_close() and self.try_open()
 
     async def wait_open(self) -> bool:
         try:

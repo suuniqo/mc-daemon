@@ -11,7 +11,7 @@ class ServerProc(Protocol):
     def start(self) -> None:
         """
         Starts the process
-        Raises `ServerProcErr` if the process hadn't stopped or if it can't be started
+        Raises `ProcErr` if the process hadn't stopped or if it can't be started
         """
         ...
 
@@ -26,7 +26,7 @@ class ServerProc(Protocol):
     def stop(self) -> None:
         """
         Stops the process
-        Raises `ServerProcErr` if the process hadn't started or if it can't be stopped
+        Raises `ProcErr` if the process hadn't started or if it can't be stopped
         """
         ...
 

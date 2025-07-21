@@ -31,6 +31,13 @@ class ServerCntl(Protocol):
         ...
 
     @abstractmethod
+    def try_restart(self) -> bool:
+        """
+        Tries to restart the server, returns wether it has restarted or not
+        """
+        ...
+
+    @abstractmethod
     async def wait_open(self) -> bool:
         """
         Sleeps until the server opens or the timeout expires

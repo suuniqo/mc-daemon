@@ -17,6 +17,7 @@ class ServerConf:
         rcon_banned_comm: Optional[list[str]],
         startup_timeout: Optional[float],
         idle_timeout: Optional[float],
+        polling_intv: Optional[float],
     ) -> None:
 
         # discord config
@@ -43,5 +44,6 @@ class ServerConf:
 
         # mntr config
         self.idle_timeout: float = idle_timeout or 5.0 * 60.0
+        self.polling_intv: float = polling_intv or 60.0
 
     # TODO: post init with validation, floats cant be negative for starters!!

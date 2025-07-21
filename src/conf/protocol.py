@@ -13,6 +13,6 @@ class ServerConfLoader(Protocol):
     def load(self) -> ServerConf:
         """
         Factory method that creates a new instance of `ServerConf`
-        Raises `ServerConfLoaderErr` if anything goes wrong
+        Raises `ConfLoaderErr` if anything goes wrong
         """
         ...

@@ -22,6 +22,7 @@ class EnvConfLoader(ServerConfLoader):
     ENV_RCON_BANNED_COMM    = "RCON_BANNED_COMM"
     ENV_STARTUP_TIMEOUT     = "STARTUP_TIMEOUT"
     ENV_IDLE_TIMEOUT        = "IDLE_TIMEOUT"
+    ENV_POLLING_INTV        = "POLLING_INTV"
 
     T = TypeVar("T")
 
@@ -88,4 +89,5 @@ class EnvConfLoader(ServerConfLoader):
             self._fetch_optional_as(self.ENV_RCON_BANNED_COMM, self._list_from_env),
             self._fetch_optional_as(self.ENV_STARTUP_TIMEOUT, float),
             self._fetch_optional_as(self.ENV_IDLE_TIMEOUT, float),
+            self._fetch_optional_as(self.ENV_POLLING_INTV, float),
         )
