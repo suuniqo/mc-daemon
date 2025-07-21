@@ -1,9 +1,9 @@
 import os
 
+from conf.types import GlobalConf
+
 from dotenv import load_dotenv
 from typing import Callable, Optional, TypeVar
-
-from conf.types import GlobalConf
 
 from .errors import ConfLoaderErr
 from .protocol import GlobalConfLoader

@@ -6,6 +6,7 @@ class BotLogger(Protocol):
     """
     Logs events through a channel specified by the user
     """
+
     @abstractmethod
     def start(self) -> None:
         """

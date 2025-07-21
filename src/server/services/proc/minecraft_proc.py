@@ -1,5 +1,5 @@
-import subprocess
 import logging
+import subprocess
 
 from typing import Optional
 
@@ -11,10 +11,15 @@ class MinecraftProc(ServerProc):
     STOP_COMMAND = b"/stop\n"
 
     def __init__(self, startup_script: str, timeout: float) -> None:
+        if timeout <= 0:
+            raise ValueError("Process operation timeout must be greater than zero")
+
         self._startup_script: str = startup_script
         self._timeout: float = timeout
         self._inst: Optional[subprocess.Popen[bytes]] = None
-        self._logger: logging.Logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
+        self._logger: logging.Logger = logging.getLogger(
+            f"{__name__}.{self.__class__.__name__}"
+        )
 
     def start(self) -> None:
         if self._inst is not None:
@@ -22,12 +27,12 @@ class MinecraftProc(ServerProc):
 
         try:
             self._inst = subprocess.Popen(
-                    self._startup_script,
-                    stdin=subprocess.PIPE,
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL
+                self._startup_script,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
             )
-        except (ValueError | OSError) as e:
+        except ValueError | OSError as e:
             raise ProcErr(f"Failed to start process: {e}")
         except Exception as e:
             raise ProcErr(f"Failed to start process: Unexpected error: {e}")
@@ -46,9 +51,13 @@ class MinecraftProc(ServerProc):
         try:
             self._inst.communicate(input=self.STOP_COMMAND, timeout=self._timeout)
         except subprocess.TimeoutExpired:
-            self._logger.warning(f"Timeout reached comunicating stop command to server instance")
+            self._logger.warning(
+                f"Timeout reached comunicating stop command to server instance"
+            )
         except Exception as e:
-            self._logger.error(f"Error communicating stop command to server instance: {e}")
+            self._logger.error(
+                f"Error communicating stop command to server instance: {e}"
+            )
 
         try:
             self._inst.wait(timeout=self._timeout)
@@ -57,7 +66,9 @@ class MinecraftProc(ServerProc):
             self._logger.warning("Killing instance...")
             self.kill()
         except Exception as e:
-            self._logger.warning(f"Error while waiting for server instance to stop: {e}")
+            self._logger.warning(
+                f"Error while waiting for server instance to stop: {e}"
+            )
             self._logger.warning("Killing instance...")
             self.kill()
 
@@ -77,5 +88,6 @@ class MinecraftProc(ServerProc):
             self._logger.critical("Instance could be in zombie state, check inmediatly")
         finally:
             self._inst = None
+
 
 mcproc = MinecraftProc("/lol", 2)

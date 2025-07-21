@@ -19,6 +19,12 @@ class EventMntr(ServerMntr):
         conn: ServerConn,
         ebus: ServerEventBus,
     ) -> None:
+        if idle_timeout <= 0:
+            raise ValueError("Startup timeout must be greater than zero")
+
+        if polling_intv <= 0:
+            raise ValueError("Polling interval must be greater than zero")
+
         self._task: Optional[asyncio.Task] = None
         self._idle_since: Optional[float] = None
 

@@ -13,13 +13,14 @@ from conf.types import GlobalConf
 
 from .mcdaemon_bot import McDaemonBot
 
+
 class BotFactory:
     @staticmethod
     async def make(conf: GlobalConf) -> McDaemonBot:
         """
         Makes a new instance of `McDaemonBot` through `ServerConf`
         """
-        intents=discord.Intents.default()
+        intents = discord.Intents.default()
         intents.message_content = True
 
         bot = McDaemonBot(conf.discord_guild, intents=intents)
@@ -31,7 +32,6 @@ class BotFactory:
         else:
             ebus = ServerEventBus()
             logger = None
-
 
         if logger:
             bot.add_logger(logger)

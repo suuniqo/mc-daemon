@@ -1,6 +1,7 @@
 from typing import Protocol, Optional
 from abc import abstractmethod
 
+
 class ServerConn(Protocol):
     """
     Provides information about the server looking at the connections on it's port

@@ -6,6 +6,7 @@ class ServerMntr(Protocol):
     """
     Monitors the server while open and performs maintenance
     """
+
     @abstractmethod
     def timeout_in(self) -> Optional[float]:
         """

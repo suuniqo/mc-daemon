@@ -15,9 +15,20 @@ from .protocol import ServerCntl
 
 
 class EventCntl(ServerCntl):
-    def __init__(self, conn: ServerConn, proc: ServerProc, ebus: ServerEventBus, startup_timeout: float) -> None:
+    def __init__(
+        self,
+        conn: ServerConn,
+        proc: ServerProc,
+        ebus: ServerEventBus,
+        startup_timeout: float,
+    ) -> None:
+        if startup_timeout <= 0:
+            raise ValueError("Startup timeout must be greater than zero")
+
         self._status: ServerStatus = ServerStatus.CLOSED
-        self._logger: logging.Logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
+        self._logger: logging.Logger = logging.getLogger(
+            f"{__name__}.{self.__class__.__name__}"
+        )
 
         self._conn: ServerConn = conn
         self._proc: ServerProc = proc

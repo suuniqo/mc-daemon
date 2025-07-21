@@ -4,6 +4,7 @@ from discord.ext import commands
 
 from bot.logger.protocol import BotLogger
 
+
 class McDaemonBot(commands.Bot):
     def __init__(self, guild_id: int, *, intents: discord.Intents) -> None:
         self._loggers: list[BotLogger] = []

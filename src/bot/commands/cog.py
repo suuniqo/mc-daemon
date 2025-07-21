@@ -20,54 +20,58 @@ class ServerCommands(commands.Cog):
         Returns whether the current guild is the guild id provided by the user for privileged commands
         """
         if inter.guild_id != self._guild_id:
-            await inter.response.send_message(embed=discord.Embed(
-                title="This command can only be used by admins on a specific guild ❌",
-                color=discord.Color.red()
-            ))
+            await inter.response.send_message(
+                embed=discord.Embed(
+                    title="This command can only be used by admins on a specific guild ❌",
+                    color=discord.Color.red(),
+                )
+            )
             return False
         return True
 
-
     @app_commands.command(name="help", description="View available commands")
     async def help(self, inter: discord.Interaction):
-        await inter.response.send_message(embed=discord.Embed(
-            title="Available commands 📋",
-            description=(
-                "- `/start` Tries to start the server\n"
-                "- `/status` Shows the server status\n"
-                "- `/lock` Locks and closes the server (admin)\n"
-                "- `/unlock` Unlocks the server (admin)\n"
-                "- `/inject` Executes the provided command in the server (admin)"
-            ),
-            color=discord.Color.yellow()
-        ))
+        await inter.response.send_message(
+            embed=discord.Embed(
+                title="Available commands 📋",
+                description=(
+                    "- `/start` Tries to start the server\n"
+                    "- `/status` Shows the server status\n"
+                    "- `/lock` Locks and closes the server (admin)\n"
+                    "- `/unlock` Unlocks the server (admin)\n"
+                    "- `/inject` Executes the provided command in the server (admin)"
+                ),
+                color=discord.Color.yellow(),
+            )
+        )
 
     @app_commands.command(name="start", description="Tries to start the server")
     async def start(self, inter: discord.Interaction) -> None:
         if self._locked:
-            await inter.response.send_message(embed=discord.Embed(
-                title="The server has been locked by admins ❌",
-                color=discord.Color.red()
-            ))
+            await inter.response.send_message(
+                embed=discord.Embed(
+                    title="The server has been locked by admins ❌",
+                    color=discord.Color.red(),
+                )
+            )
             return
 
         srv = self._server
 
         if srv.cntl.try_open():
             await inter.response.defer()
-            
+
             opened = await srv.cntl.wait_open()
 
             if not opened:
-                embed=discord.Embed(
-                    title="The server hung on startup ❌",
-                    color=discord.Color.red()
+                embed = discord.Embed(
+                    title="The server hung on startup ❌", color=discord.Color.red()
                 )
             else:
-                embed=discord.Embed(
+                embed = discord.Embed(
                     title=f"The server is ready ✅",
                     description=f"You can join now {inter.user.mention}",
-                    color=discord.Color.green()
+                    color=discord.Color.green(),
                 )
 
             await inter.followup.send(embed=embed)
@@ -79,17 +83,16 @@ class ServerCommands(commands.Cog):
             case ServerStatus.OPEN | ServerStatus.OPENING:
                 embed = discord.Embed(
                     title=f"The server is already {status} ✅",
-                    color=discord.Color.green()
+                    color=discord.Color.green(),
                 )
             case ServerStatus.CLOSING:
                 embed = discord.Embed(
                     title=f"The server is {status}, please stand by ⚠️",
-                    color=discord.Color.yellow()
+                    color=discord.Color.yellow(),
                 )
             case ServerStatus.CLOSED:
                 embed = discord.Embed(
-                    title="Please try again ❌",
-                    color=discord.Color.red()
+                    title="Please try again ❌", color=discord.Color.red()
                 )
 
         await inter.response.send_message(embed=embed)
@@ -102,10 +105,11 @@ class ServerCommands(commands.Cog):
         remaining = srv.mntr.timeout_in()
 
         if status != ServerStatus.OPEN:
-            await inter.response.send_message(embed=discord.Embed(
-                title=f"The server is {status} 📊",
-                color=discord.Color.blue()
-            ))
+            await inter.response.send_message(
+                embed=discord.Embed(
+                    title=f"The server is {status} 📊", color=discord.Color.blue()
+                )
+            )
             return
 
         if remaining:
@@ -118,7 +122,7 @@ class ServerCommands(commands.Cog):
                 color=discord.Color.yellow(),
             )
         else:
-            embed=discord.Embed(
+            embed = discord.Embed(
                 title=f"The server is {status} 📊",
                 description=f"There are currently {srv.conn.client_count()} players online",
                 color=discord.Color.blue(),
@@ -134,23 +138,26 @@ class ServerCommands(commands.Cog):
             return
 
         if self._locked:
-            await inter.response.send_message(embed=discord.Embed(
-                title="The server is already locked ✅",
-                color=discord.Color.green()
-            ))
+            await inter.response.send_message(
+                embed=discord.Embed(
+                    title="The server is already locked ✅", color=discord.Color.green()
+                )
+            )
             return
 
         srv = self._server
         status = srv.cntl.status()
 
         if status == ServerStatus.OPENING or status == ServerStatus.CLOSING:
-            await inter.response.send_message(embed=discord.Embed(
-                title=f"The server can't be locked because it's {status} ❌",
-                description="Please try again when the operation finishes",
-                color=discord.Color.red()
-            ))
+            await inter.response.send_message(
+                embed=discord.Embed(
+                    title=f"The server can't be locked because it's {status} ❌",
+                    description="Please try again when the operation finishes",
+                    color=discord.Color.red(),
+                )
+            )
             return
-        
+
         self._locked = True
 
         await inter.response.defer()
@@ -158,10 +165,11 @@ class ServerCommands(commands.Cog):
         if status == ServerStatus.OPEN:
             srv.cntl.try_close()
 
-        await inter.followup.send(embed=discord.Embed(
-            title="The server has been locked 🔒",
-            color=discord.Color.yellow()
-        ))
+        await inter.followup.send(
+            embed=discord.Embed(
+                title="The server has been locked 🔒", color=discord.Color.yellow()
+            )
+        )
 
     @app_commands.command(name="unlock", description="Unlocks the server")
     @app_commands.guild_only()
@@ -172,19 +180,19 @@ class ServerCommands(commands.Cog):
 
         if not self._locked:
             embed = discord.Embed(
-                title="The server is already unlocked ✅",
-                color=discord.Color.green()
+                title="The server is already unlocked ✅", color=discord.Color.green()
             )
         else:
             self._locked = False
             embed = discord.Embed(
-                title="The server has been unlocked 🔓",
-                color=discord.Color.yellow()
+                title="The server has been unlocked 🔓", color=discord.Color.yellow()
             )
 
         await inter.response.send_message(embed=embed)
 
-    @app_commands.command(name="inject", description="Executes the provided command in the server")
+    @app_commands.command(
+        name="inject", description="Executes the provided command in the server"
+    )
     @app_commands.guild_only()
     @app_commands.rename(comm="command")
     @app_commands.describe(comm="Command to execute")
@@ -197,10 +205,12 @@ class ServerCommands(commands.Cog):
         status = srv.cntl.status()
 
         if status != ServerStatus.OPEN:
-            await inter.response.send_message(embed=discord.Embed(
-                title=f"It's not possible to execute commands, the server is {status} ❌",
-                color=discord.Color.red(),
-            ))
+            await inter.response.send_message(
+                embed=discord.Embed(
+                    title=f"It's not possible to execute commands, the server is {status} ❌",
+                    color=discord.Color.red(),
+                )
+            )
             return
 
         await inter.response.defer()

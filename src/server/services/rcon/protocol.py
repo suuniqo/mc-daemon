@@ -1,6 +1,7 @@
 from typing import Protocol
 from abc import abstractmethod
 
+
 class ServerRcon(Protocol):
     """
     Abstracts the logic and command parsing behind the minecraft rcon protocol

@@ -1,4 +1,3 @@
-
 from conf.types import GlobalConf
 
 from domain.event.ebus import ServerEventBus
