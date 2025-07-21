@@ -78,10 +78,10 @@ class EnvConfLoader(ServerConfLoader):
 
         return ServerConf(
             self._fetch_mandatory_as(self.ENV_DISCORD_TOKEN, str),
-            self._fetch_mandatory_as(self.ENV_DISCORD_GUILD, str),
+            self._fetch_mandatory_as(self.ENV_DISCORD_GUILD, int),
             self._fetch_mandatory_as(self.ENV_PROCESS_SCRIPT, str),
             self._fetch_optional_as(self.ENV_PROCESS_TIMEOUT, float),
-            self._fetch_optional_as(self.ENV_DISCORD_LOG_CHANNEL, str),
+            self._fetch_optional_as(self.ENV_DISCORD_LOG_CHANNEL, int),
             self._fetch_optional_as(self.ENV_MINECRAFT_PORT, int),
             self._fetch_optional_as(self.ENV_RCON_PORT, int),
             self._fetch_optional_as(self.ENV_RCON_PWD, str),

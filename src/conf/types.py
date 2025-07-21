@@ -5,10 +5,10 @@ class ServerConf:
     def __init__(
         self,
         discord_token: str,
-        discord_guild: str,
+        discord_guild: int,
         process_script: str,
         process_timeout: Optional[float],
-        discord_log_channel: Optional[str],
+        discord_log_channel: Optional[int],
         minecraft_port: Optional[int],
         rcon_port: Optional[int],
         rcon_pwd: Optional[str],
@@ -22,14 +22,14 @@ class ServerConf:
 
         # discord config
         self.discord_token: str = discord_token
-        self.discord_guild: str = discord_guild
+        self.discord_guild: int = discord_guild
 
         # process config
         self.process_script: str = process_script
         self.process_timeout: float = process_timeout or 4.0
 
         # logger config
-        self.discord_log_channel: Optional[str] = discord_log_channel or None
+        self.discord_log_channel: Optional[int] = discord_log_channel or None
 
         # conn config
         self.minecraft_port: int = minecraft_port or 25565
