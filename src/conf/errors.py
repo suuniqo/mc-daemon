@@ -1,0 +1,2 @@
+class ConfLoaderErr(Exception):
+    pass

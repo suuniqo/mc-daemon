@@ -4,11 +4,11 @@ from dotenv import load_dotenv
 from typing import Callable, Optional, TypeVar
 
 from .types import ServerConf
-from .errors import ServerConfLoaderErr
+from .errors import ConfLoaderErr
 from .protocol import ServerConfLoader
 
 
-class EnvServerConfLoader(ServerConfLoader):
+class EnvConfLoader(ServerConfLoader):
     ENV_DISCORD_TOKEN       = "DISCORD_TOKEN"
     ENV_DISCORD_GUILD       = "DISCORD_GUILD"
     ENV_DISCORD_LOG_CHANNEL = "DISCORD_LOG_CHANNEL"
@@ -20,7 +20,8 @@ class EnvServerConfLoader(ServerConfLoader):
     ENV_RCON_TIMEOUT        = "RCON_TIMEOUT"
     ENV_RCON_MAX_COMM_LEN   = "RCON_MAX_COMM_LEN"
     ENV_RCON_BANNED_COMM    = "RCON_BANNED_COMM"
-    ENV_EMPTY_TIMEOUT       = "EMPTY_TIMEOUT"
+    ENV_STARTUP_TIMEOUT     = "STARTUP_TIMEOUT"
+    ENV_IDLE_TIMEOUT        = "IDLE_TIMEOUT"
 
     T = TypeVar("T")
 
@@ -43,7 +44,7 @@ class EnvServerConfLoader(ServerConfLoader):
 
             return items
         except Exception as e:
-            raise ServerConfLoaderErr(f"couldn't parse list {env}: {e}")
+            raise ConfLoaderErr(f"couldn't parse list {env}: {e}")
 
     @staticmethod
     def _fetch_mandatory_as(envname: str, cast: Callable[[str], T]) -> T:
@@ -54,7 +55,7 @@ class EnvServerConfLoader(ServerConfLoader):
         env = os.getenv(envname)
 
         if env is None:
-            raise ServerConfLoaderErr(f"mandatory env variable {envname} is missing")
+            raise ConfLoaderErr(f"mandatory env variable {envname} is missing")
 
         return cast(env)
 
@@ -78,12 +79,13 @@ class EnvServerConfLoader(ServerConfLoader):
             self._fetch_mandatory_as(self.ENV_DISCORD_GUILD, str),
             self._fetch_mandatory_as(self.ENV_DISCORD_LOG_CHANNEL, str),
             self._fetch_mandatory_as(self.ENV_PROCESS_SCRIPT, str),
-            self._fetch_optional_as(self.ENV_PROCESS_TIMEOUT, int),
+            self._fetch_optional_as(self.ENV_PROCESS_TIMEOUT, float),
             self._fetch_optional_as(self.ENV_MINECRAFT_PORT, int),
             self._fetch_optional_as(self.ENV_RCON_PORT, int),
             self._fetch_optional_as(self.ENV_RCON_PWD, str),
-            self._fetch_optional_as(self.ENV_RCON_TIMEOUT, int),
+            self._fetch_optional_as(self.ENV_RCON_TIMEOUT, float),
             self._fetch_optional_as(self.ENV_RCON_MAX_COMM_LEN, int),
             self._fetch_optional_as(self.ENV_RCON_BANNED_COMM, self._list_from_env),
-            self._fetch_optional_as(self.ENV_EMPTY_TIMEOUT, int),
+            self._fetch_optional_as(self.ENV_STARTUP_TIMEOUT, float),
+            self._fetch_optional_as(self.ENV_IDLE_TIMEOUT, float),
         )

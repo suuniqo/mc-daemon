@@ -1,2 +1,0 @@
-class EventErr(Exception):
-    pass

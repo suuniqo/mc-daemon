@@ -5,18 +5,18 @@ from .protocol import ServerRcon
 from .errors import RconErr, CommErr
 
 
-class McipcServerRcon(ServerRcon):
+class McipcRcon(ServerRcon):
     def __init__(
         self,
         port: int,
         pwd: Optional[str],
-        timeout: Optional[int],
+        timeout: float,
         max_comm_len: int,
         banned_comms: list[str],
     ) -> None:
         self._port: int = port
         self._pwd: Optional[str] = pwd
-        self._timeout: Optional[int] = timeout
+        self._timeout: float = timeout
         self._max_comm_len: int = max_comm_len
         self._bcomms: list[str] = banned_comms
 
@@ -26,7 +26,7 @@ class McipcServerRcon(ServerRcon):
         if not comm.strip() or len(comm) > self._max_comm_len:
             raise CommErr("Invalid command format")
 
-        for icomm in McipcServerRcon.ILLEGAL_COMMS:
+        for icomm in McipcRcon.ILLEGAL_COMMS:
             if icomm in comm.lower():
                 raise CommErr(f"Command {icomm} is not allowed")
         try:

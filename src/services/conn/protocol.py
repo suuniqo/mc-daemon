@@ -2,7 +2,9 @@ from typing import Protocol
 from abc import abstractmethod
 
 class ServerConn(Protocol):
-    _port: int
+    """
+    Provides information about the server looking at the connections on it's port
+    """
 
     @abstractmethod
     def is_open(self) -> bool:

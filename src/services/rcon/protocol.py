@@ -1,15 +1,13 @@
-from typing import Protocol, Optional
+from typing import Protocol
 from abc import abstractmethod
 
 class ServerRcon(Protocol):
+    """
+    Abstracts the logic and command parsing behind the minecraft rcon protocol
+    """
+
     HOST = "127.0.0.1"
     ILLEGAL_COMMS = ["/stop"]
-
-    _port: int
-    _pwd: Optional[str]
-    _timeout: Optional[int]
-    _max_comm_len: int
-    _bcomms: list[str]
 
     @abstractmethod
     def execute(self, comm: str) -> str:

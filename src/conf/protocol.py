@@ -5,6 +5,10 @@ from .types import ServerConf
 
 
 class ServerConfLoader(Protocol):
+    """
+    Factory class for `ServerConf`
+    """
+
     @abstractmethod
     def load(self) -> ServerConf:
         """

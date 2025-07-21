@@ -85,7 +85,7 @@ class ServerConf:
         self.token: str = token
         self.guild: discord.Object = discord.Object(guild)
 
-class ServerRCON:
+class ServerRcon:
     PORT = 25575
     HOST = "127.0.0.1"
     TIMEOUT = 15
@@ -98,11 +98,11 @@ class ServerRCON:
         if not comm.strip() or len(comm) > 256:
             return False, "invalid command format"
                             
-        for icomm in ServerRCON.ILLEGAL_COMMS:
+        for icomm in ServerRcon.ILLEGAL_COMMS:
             if icomm in comm.lower():
                 return False, f"command {icomm} not allowed"
         try:
-            with Client(ServerRCON.HOST, ServerRCON.PORT, passwd=self._pwd, timeout=ServerRCON.TIMEOUT) as client:
+            with Client(ServerRcon.HOST, ServerRcon.PORT, passwd=self._pwd, timeout=ServerRcon.TIMEOUT) as client:
                 return True, client.run(comm)
         except Exception as e:
             return False, f"RCON error: {str(e)}"
@@ -222,7 +222,7 @@ class ServerManager(discord.Client):
 
         self.conf = ServerConf(env.token, env.guild)
         self.cntl = ServerCntl(env.script)
-        self.rcon = ServerRCON(env.rconpwd)
+        self.rcon = ServerRcon(env.rconpwd)
         self.mntr = ServerMntr(self.cntl)
 
         self.tree = app_commands.CommandTree(self)

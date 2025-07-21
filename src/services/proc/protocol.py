@@ -3,13 +3,15 @@ from typing import Protocol
 
 
 class ServerProc(Protocol):
-    _startup_script: str
+    """
+    Abstracts the logic and error handling behind managing the server process
+    """
 
     @abstractmethod
     def start(self) -> None:
         """
         Starts the process
-        Raises `ServerProcErr` if the process hadn't stopped or if anything goes wrong
+        Raises `ServerProcErr` if the process hadn't stopped or if it can't be started
         """
         ...
 
@@ -17,7 +19,6 @@ class ServerProc(Protocol):
     def alive(self) -> bool:
         """
         The process won't be alive if it hasn't started yet or if it has crashed
-        Raises `ServerProcErr` if anything goes wrong
         """
         ...
 
@@ -25,6 +26,13 @@ class ServerProc(Protocol):
     def stop(self) -> None:
         """
         Stops the process
-        Raises `ServerProcErr` if the process hadn't started or if anything goes wrong
+        Raises `ServerProcErr` if the process hadn't started or if it can't be stopped
+        """
+        ...
+
+    @abstractmethod
+    def kill(self) -> None:
+        """
+        Kills the process
         """
         ...

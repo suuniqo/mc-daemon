@@ -1,2 +1,0 @@
-class ServerConfLoaderErr(Exception):
-    pass

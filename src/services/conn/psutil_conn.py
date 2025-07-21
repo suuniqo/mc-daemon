@@ -2,7 +2,7 @@ import psutil
 
 from .protocol import ServerConn
 
-class PsutilServerConn(ServerConn):
+class PsutilConn(ServerConn):
     def __init__(self, port: int) -> None:
         self._port: int = port
 
