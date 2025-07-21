@@ -1,4 +1,4 @@
-from conf.types import ServerConf
+from conf.types import GlobalConf
 
 from services.conn.protocol import ServerConn
 from services.proc.minecraft_proc import MinecraftProc
@@ -11,7 +11,7 @@ from .event_cntl import EventCntl
 
 class CntlFactory:
     @staticmethod
-    def make(conf: ServerConf, conn: ServerConn, ebus: ServerEventBus) -> ServerCntl:
+    def make(conf: GlobalConf, conn: ServerConn, ebus: ServerEventBus) -> ServerCntl:
         """
         Makes a new instance of `ServerCntl` through `ServerConf`
         """

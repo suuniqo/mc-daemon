@@ -73,22 +73,23 @@ class EnvConfLoader(GlobalConfLoader):
 
         return cast(env)
 
-    def load(self) -> GlobalConf:
+    @staticmethod
+    def load() -> GlobalConf:
         load_dotenv()
 
         return GlobalConf(
-            self._fetch_mandatory_as(self.ENV_DISCORD_TOKEN, str),
-            self._fetch_mandatory_as(self.ENV_DISCORD_GUILD, int),
-            self._fetch_mandatory_as(self.ENV_PROCESS_SCRIPT, str),
-            self._fetch_optional_as(self.ENV_PROCESS_TIMEOUT, float),
-            self._fetch_optional_as(self.ENV_DISCORD_LOG_CHANNEL, int),
-            self._fetch_optional_as(self.ENV_MINECRAFT_PORT, int),
-            self._fetch_optional_as(self.ENV_RCON_PORT, int),
-            self._fetch_optional_as(self.ENV_RCON_PWD, str),
-            self._fetch_optional_as(self.ENV_RCON_TIMEOUT, float),
-            self._fetch_optional_as(self.ENV_RCON_MAX_COMM_LEN, int),
-            self._fetch_optional_as(self.ENV_RCON_BANNED_COMM, self._list_from_env),
-            self._fetch_optional_as(self.ENV_STARTUP_TIMEOUT, float),
-            self._fetch_optional_as(self.ENV_IDLE_TIMEOUT, float),
-            self._fetch_optional_as(self.ENV_POLLING_INTV, float),
+            EnvConfLoader._fetch_mandatory_as(EnvConfLoader.ENV_DISCORD_TOKEN, str),
+            EnvConfLoader._fetch_mandatory_as(EnvConfLoader.ENV_DISCORD_GUILD, int),
+            EnvConfLoader._fetch_mandatory_as(EnvConfLoader.ENV_PROCESS_SCRIPT, str),
+            EnvConfLoader._fetch_optional_as(EnvConfLoader.ENV_PROCESS_TIMEOUT, float),
+            EnvConfLoader._fetch_optional_as(EnvConfLoader.ENV_DISCORD_LOG_CHANNEL, int),
+            EnvConfLoader._fetch_optional_as(EnvConfLoader.ENV_MINECRAFT_PORT, int),
+            EnvConfLoader._fetch_optional_as(EnvConfLoader.ENV_RCON_PORT, int),
+            EnvConfLoader._fetch_optional_as(EnvConfLoader.ENV_RCON_PWD, str),
+            EnvConfLoader._fetch_optional_as(EnvConfLoader.ENV_RCON_TIMEOUT, float),
+            EnvConfLoader._fetch_optional_as(EnvConfLoader.ENV_RCON_MAX_COMM_LEN, int),
+            EnvConfLoader._fetch_optional_as(EnvConfLoader.ENV_RCON_BANNED_COMM, EnvConfLoader._list_from_env),
+            EnvConfLoader._fetch_optional_as(EnvConfLoader.ENV_STARTUP_TIMEOUT, float),
+            EnvConfLoader._fetch_optional_as(EnvConfLoader.ENV_IDLE_TIMEOUT, float),
+            EnvConfLoader._fetch_optional_as(EnvConfLoader.ENV_POLLING_INTV, float),
         )

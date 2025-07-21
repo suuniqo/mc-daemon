@@ -15,6 +15,9 @@ from .types import ServerData
 class ServerDataFactory:
     @staticmethod
     def make(conf: GlobalConf, ebus: ServerEventBus) -> ServerData:
+        """
+        Makes a new instance of `ServerData` through `ServerConf`
+        """
         conn = PsutilConn(conf.minecraft_port)
         rcon = McipcRcon(
             port=conf.rcon_port,

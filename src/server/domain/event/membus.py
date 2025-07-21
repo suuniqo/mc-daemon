@@ -12,7 +12,7 @@ class MemoryEventBus(ServerEventBus):
     """
     def __init__(self, subs: list[ServerEvent]) -> None:
         self._queue: asyncio.Queue[ServerEvent] = asyncio.Queue()
-        self._subs: list[ServerEvent] = subs
+        self._subs: list[ServerEvent] = list(set(subs))
         super().__init__()
 
     def subscribe(self, event: ServerEvent, handler: Callable[[], None]) -> None:
