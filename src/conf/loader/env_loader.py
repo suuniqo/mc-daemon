@@ -3,7 +3,8 @@ import os
 from dotenv import load_dotenv
 from typing import Callable, Optional, TypeVar
 
-from .types import ServerConf
+from conf.types import ServerConf
+
 from .errors import ConfLoaderErr
 from .protocol import ServerConfLoader
 

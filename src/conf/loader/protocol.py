@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import Protocol
 
-from .types import ServerConf
+from conf.types import ServerConf
 
 
 class ServerConfLoader(Protocol):

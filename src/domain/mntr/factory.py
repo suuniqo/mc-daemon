@@ -8,7 +8,7 @@ from .protocol import ServerMntr
 from .event_mntr import EventMntr
 
 
-class CntlFactory:
+class MntrFactory:
     @staticmethod
     def make(conf: ServerConf, conn: ServerConn, ebus: ServerEventBus) -> ServerMntr:
         """

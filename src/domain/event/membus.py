@@ -8,7 +8,7 @@ from .types import ServerEvent
 
 class MemoryEventBus(ServerEventBus):
     """
-    This class stores all the events (that the user is interested in) emitted by the bus
+    This class stores all the events (that the user has subscribed to) emitted by the bus
     """
     def __init__(self, subs: list[ServerEvent]) -> None:
         self._queue: asyncio.Queue[ServerEvent] = asyncio.Queue()
