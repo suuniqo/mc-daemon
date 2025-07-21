@@ -1,5 +1,5 @@
 
-from conf.types import ServerConf
+from conf.types import GlobalConf
 
 from domain.event.ebus import ServerEventBus
 
@@ -9,12 +9,12 @@ from domain.cntl.factory import CntlFactory
 from services.conn.psutil_conn import PsutilConn
 from services.rcon.mcipc_rcon import McipcRcon
 
-from .types import BotData
+from .types import ServerData
 
 
-class BotDataFactory:
+class ServerDataFactory:
     @staticmethod
-    def make(conf: ServerConf, ebus: ServerEventBus) -> BotData:
+    def make(conf: GlobalConf, ebus: ServerEventBus) -> ServerData:
         conn = PsutilConn(conf.minecraft_port)
         rcon = McipcRcon(
             port=conf.rcon_port,
@@ -24,7 +24,7 @@ class BotDataFactory:
             banned_comms=conf.rcon_banned_comm,
         )
 
-        return BotData(
+        return ServerData(
             conn=conn,
             rcon=rcon,
             mntr=MntrFactory.make(conf, conn, ebus),

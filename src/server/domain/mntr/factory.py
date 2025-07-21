@@ -1,4 +1,4 @@
-from conf.types import ServerConf
+from conf.types import GlobalConf
 
 from services.conn.protocol import ServerConn
 
@@ -10,7 +10,7 @@ from .event_mntr import EventMntr
 
 class MntrFactory:
     @staticmethod
-    def make(conf: ServerConf, conn: ServerConn, ebus: ServerEventBus) -> ServerMntr:
+    def make(conf: GlobalConf, conn: ServerConn, ebus: ServerEventBus) -> ServerMntr:
         """
         Makes a new instance of `ServerMntr` through `ServerConf`
         """

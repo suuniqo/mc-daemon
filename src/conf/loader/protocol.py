@@ -1,16 +1,16 @@
 from abc import abstractmethod
 from typing import Protocol
 
-from conf.types import ServerConf
+from conf.types import GlobalConf
 
 
-class ServerConfLoader(Protocol):
+class GlobalConfLoader(Protocol):
     """
     Factory class for `ServerConf`
     """
 
     @abstractmethod
-    def load(self) -> ServerConf:
+    def load(self) -> GlobalConf:
         """
         Factory method that creates a new instance of `ServerConf`
         Raises `ConfLoaderErr` if anything goes wrong

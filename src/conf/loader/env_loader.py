@@ -3,13 +3,13 @@ import os
 from dotenv import load_dotenv
 from typing import Callable, Optional, TypeVar
 
-from conf.types import ServerConf
+from conf.types import GlobalConf
 
 from .errors import ConfLoaderErr
-from .protocol import ServerConfLoader
+from .protocol import GlobalConfLoader
 
 
-class EnvConfLoader(ServerConfLoader):
+class EnvConfLoader(GlobalConfLoader):
     ENV_DISCORD_TOKEN       = "DISCORD_TOKEN"
     ENV_DISCORD_GUILD       = "DISCORD_GUILD"
     ENV_PROCESS_SCRIPT      = "PROCESS_SCRIPT"
@@ -73,10 +73,10 @@ class EnvConfLoader(ServerConfLoader):
 
         return cast(env)
 
-    def load(self) -> ServerConf:
+    def load(self) -> GlobalConf:
         load_dotenv()
 
-        return ServerConf(
+        return GlobalConf(
             self._fetch_mandatory_as(self.ENV_DISCORD_TOKEN, str),
             self._fetch_mandatory_as(self.ENV_DISCORD_GUILD, int),
             self._fetch_mandatory_as(self.ENV_PROCESS_SCRIPT, str),

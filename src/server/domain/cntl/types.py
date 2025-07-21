@@ -6,3 +6,6 @@ class ServerStatus(Enum):
     OPEN    = "OPEN"
     OPENING = "OPENING"
     CLOSING = "CLOSING"
+
+    def __str__(self) -> str:
+        return str(self).lower()

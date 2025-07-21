@@ -1,7 +1,7 @@
 from typing import Optional
 
 
-class ServerConf:
+class GlobalConf:
     def __init__(
         self,
         discord_token: str,

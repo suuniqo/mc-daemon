@@ -6,8 +6,8 @@ from typing import Optional
 
 from discord.channel import TextChannel
 
-from domain.event.membus import MemoryEventBus
-from domain.event.types import ServerEvent
+from server.domain.event.membus import MemoryEventBus
+from server.domain.event.types import ServerEvent
 
 from .protocol import BotLogger
 
@@ -31,6 +31,13 @@ class EventLogger(BotLogger):
             f"{__name__}.{self.__class__.__name__}"
         )
 
+    async def _channel_is_valid(self) -> bool:
+        try:
+            channel = await self._client.fetch_channel(self._channel.id)
+            return channel is not None
+        except Exception:
+            return False
+
     def start(self) -> None:
         if self._task is not None and not self._task.done():
             self._logger.warning("Tried to start logger when it was running")
@@ -39,9 +46,7 @@ class EventLogger(BotLogger):
         self._task = asyncio.create_task(self._logger_loop())
 
     async def _logger_loop(self) -> None:
-        while self._client.is_closed():
-            embed = None
-
+        while not self._client.is_closed() and await self._channel_is_valid():
             match await self._membus.pop():
                 case ServerEvent.OPENED:
                     embed = discord.Embed(

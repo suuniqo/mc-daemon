@@ -23,8 +23,11 @@ class McipcRcon(ServerRcon):
         self._bcomms.extend(ServerRcon.ILLEGAL_COMMS)
 
     def execute(self, comm: str) -> str:
-        if not comm.strip() or len(comm) > self._max_comm_len:
-            raise CommErr("Invalid command format")
+        if not comm.strip():
+            raise CommErr("The command is empty")
+
+        if len(comm) > self._max_comm_len:
+            raise CommErr("The command is too long")
 
         for icomm in McipcRcon.ILLEGAL_COMMS:
             if icomm in comm.lower():
