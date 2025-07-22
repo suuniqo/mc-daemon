@@ -1,8 +1,7 @@
 from conf.types import GlobalConf
 
-from services.conn.protocol import ServerConn
-
-from event.ebus import ServerEventBus
+from server.services.conn.protocol import ServerConn
+from server.domain.event.ebus import ServerEventBus
 
 from .protocol import ServerMntr
 from .event_mntr import EventMntr

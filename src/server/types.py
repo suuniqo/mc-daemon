@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 
-from domain.cntl.protocol import ServerCntl
-from domain.mntr.protocol import ServerMntr
+from server.domain.cntl.protocol import ServerCntl
+from server.domain.mntr.protocol import ServerMntr
 
-from services.conn.protocol import ServerConn
-from services.rcon.protocol import ServerRcon
+from server.services.conn.protocol import ServerConn
+from server.services.rcon.protocol import ServerRcon
 
 
 @dataclass

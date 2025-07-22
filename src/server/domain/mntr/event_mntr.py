@@ -3,9 +3,9 @@ import time
 
 from typing import Optional
 
-from domain.event.types import ServerEvent
-from event.ebus import ServerEventBus
-from services.conn.protocol import ServerConn
+from server.domain.event.types import ServerEvent
+from server.domain.event.ebus import ServerEventBus
+from server.services.conn.protocol import ServerConn
 
 from .protocol import ServerMntr
 from .errors import MntrErr

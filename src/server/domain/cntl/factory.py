@@ -1,9 +1,9 @@
 from conf.types import GlobalConf
 
-from services.conn.protocol import ServerConn
-from services.proc.minecraft_proc import MinecraftProc
+from server.services.conn.protocol import ServerConn
+from server.services.proc.minecraft_proc import MinecraftProc
 
-from event.ebus import ServerEventBus
+from server.domain.event.ebus import ServerEventBus
 
 from .protocol import ServerCntl
 from .event_cntl import EventCntl

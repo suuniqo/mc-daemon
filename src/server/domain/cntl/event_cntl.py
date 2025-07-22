@@ -1,14 +1,13 @@
 import asyncio
 import logging
 
-from services.conn.protocol import ServerConn
-from services.conn.errors import TimeoutExpired
+from server.services.conn.protocol import ServerConn
+from server.services.conn.errors import TimeoutExpired
+from server.services.proc.protocol import ServerProc
+from server.services.proc.errors import ProcErr
 
-from services.proc.protocol import ServerProc
-from services.proc.errors import ProcErr
-
-from event.ebus import ServerEventBus
-from event.types import ServerEvent
+from server.domain.event.ebus import ServerEventBus
+from server.domain.event.types import ServerEvent
 
 from .types import ServerStatus
 from .protocol import ServerCntl
