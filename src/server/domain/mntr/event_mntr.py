@@ -37,7 +37,7 @@ class EventMntr(ServerMntr):
         self._ebus.subscribe(ServerEvent.CLOSING, self._stop)
 
     def timeout_in(self) -> Optional[float]:
-        if not self._idle_since:
+        if self._idle_since is None:
             return None
 
         return max(self._idle_timeout - self._idle_since, 0)

@@ -71,6 +71,8 @@ class MinecraftProc(ServerProc):
             )
             self._logger.warning("Killing instance...")
             self.kill()
+        finally:
+            self._inst = None
 
     def kill(self) -> None:
         if not self._inst:
@@ -86,8 +88,6 @@ class MinecraftProc(ServerProc):
         except Exception as e:
             self._logger.critical(f"Error killing instance: {e}")
             self._logger.critical("Instance could be in zombie state, check inmediatly")
-        finally:
-            self._inst = None
 
 
 mcproc = MinecraftProc("/lol", 2)

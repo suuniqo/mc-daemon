@@ -36,6 +36,8 @@ class McipcRcon(ServerRcon):
         self._max_comm_len: int = max_comm_len
         self._bcomms: list[str] = banned_comms
 
+        print(banned_comms)
+
         self._bcomms.extend(ServerRcon.ILLEGAL_COMMS)
 
     def execute(self, comm: str) -> str:
@@ -45,7 +47,7 @@ class McipcRcon(ServerRcon):
         if len(comm) > self._max_comm_len:
             raise CommErr("The command is too long")
 
-        for icomm in McipcRcon.ILLEGAL_COMMS:
+        for icomm in self._bcomms:
             if icomm in comm.lower():
                 raise CommErr(f"Command {icomm} is not allowed")
         try:
