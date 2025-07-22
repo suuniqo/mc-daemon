@@ -1,7 +1,6 @@
 import discord
 
 from bot.commands.cog import ServerCommands
-from bot.errors import BotErr
 from bot.logger.event_logger import EventLogger
 
 from server.domain.event.types import ServerEvent

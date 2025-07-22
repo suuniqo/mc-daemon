@@ -1,2 +1,0 @@
-class BotErr(Exception):
-    pass
