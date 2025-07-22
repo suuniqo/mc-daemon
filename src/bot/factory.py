@@ -17,38 +17,6 @@ from .mcdaemon_bot import McDaemonBot
 
 class BotFactory:
     @staticmethod
-    async def _validate_discord_guild(bot: discord.Client, guild_id: int) -> None:
-        try:
-            await bot.fetch_guild(guild_id)
-        except discord.NotFound:
-            raise BotErr(f"guild {guild_id} not found")
-        except discord.Forbidden:
-            raise BotErr(f"access to guild {guild_id} is forbidden to the bot")
-        except discord.HTTPException as e:
-            raise BotErr(f"HTTP error while fetching guild {guild_id}: {e}")
-        except Exception as e:
-            raise BotErr(f"Unexpected error validating guild {guild_id}: {e}")
-
-    @staticmethod
-    async def _validate_discord_channel(bot: discord.Client, guild_id: int, channel_id: int) -> None:
-        try:
-            channel = await bot.fetch_channel(channel_id)
-
-            if not isinstance(channel, discord.TextChannel):
-                raise BotErr(f"channel {channel_id} must be a guild TextChannel")
-
-            if getattr(channel, "guild", None) is None or channel.guild.id != guild_id:
-                raise BotErr(f"channel {channel_id} must belong to the specified guild {guild_id}")
-        except discord.NotFound:
-            raise BotErr(f"channel {channel_id} not found")
-        except discord.Forbidden:
-            raise BotErr(f"access to channel {channel_id} is forbidden to the bot")
-        except discord.HTTPException as e:
-            raise BotErr(f"HTTP error while fetching channel {channel_id}: {e}")
-        except Exception as e:
-            raise BotErr(f"Unexpected error validating channel {channel_id}: {e}")
-
-    @staticmethod
     async def make(conf: GlobalConf) -> McDaemonBot:
         """
         Makes a new instance of `McDaemonBot` through `ServerConf`
@@ -58,10 +26,7 @@ class BotFactory:
 
         bot = McDaemonBot(conf.discord_guild, intents=intents)
 
-        await BotFactory._validate_discord_guild(bot, conf.discord_guild)
-
         if conf.discord_log_channel is not None:
-            await BotFactory._validate_discord_channel(bot, conf.discord_guild, conf.discord_log_channel)
             # we need memory bus for logging
             ebus = MemoryEventBus(list(ServerEvent))
             logger = EventLogger(bot, ebus, conf.discord_log_channel)
