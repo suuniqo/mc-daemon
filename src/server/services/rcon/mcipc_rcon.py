@@ -36,8 +36,6 @@ class McipcRcon(ServerRcon):
         self._max_comm_len: int = max_comm_len
         self._bcomms: list[str] = banned_comms
 
-        print(banned_comms)
-
         self._bcomms.extend(ServerRcon.ILLEGAL_COMMS)
 
     def execute(self, comm: str) -> str:

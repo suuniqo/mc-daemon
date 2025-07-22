@@ -40,7 +40,7 @@ class EventMntr(ServerMntr):
         if self._idle_since is None:
             return None
 
-        return max(self._idle_timeout - self._idle_since, 0)
+        return max(self._idle_timeout - time.time(), 0)
 
     def _start(self) -> None:
         """

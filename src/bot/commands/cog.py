@@ -112,7 +112,7 @@ class ServerCommands(commands.Cog):
             )
             return
 
-        if remaining:
+        if remaining is not None:
             mins = int(remaining // 60)
             secs = int(remaining % 60)
 
