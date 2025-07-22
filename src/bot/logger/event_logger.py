@@ -36,7 +36,8 @@ class EventLogger(BotLogger):
             if isinstance(channel, TextChannel):
                 return channel
             return None
-        except Exception:
+        except Exception as e:
+            self._logger.error(f"Error validating channel: {e}")
             return None
 
     def start(self) -> None:
