@@ -102,7 +102,6 @@ class ServerCommands(commands.Cog):
         srv = self._server
 
         status = srv.cntl.status()
-        remaining = srv.mntr.timeout_in()
 
         if status != ServerStatus.OPEN:
             await inter.response.send_message(
@@ -112,7 +111,16 @@ class ServerCommands(commands.Cog):
             )
             return
 
-        if remaining is not None:
+        remaining = srv.mntr.timeout_in()
+        client_count = srv.conn.client_count()
+
+        if client_count > 0 or remaining is None:
+            embed = discord.Embed(
+                title=f"The server is {status} 📊",
+                description=f"There are currently {srv.conn.client_count()} players online",
+                color=discord.Color.blue(),
+            )
+        else:
             mins = int(remaining // 60)
             secs = int(remaining % 60)
 
@@ -120,12 +128,6 @@ class ServerCommands(commands.Cog):
                 title=f"The server is {status} but empty ⚠️",
                 description=f"It will close in {mins} minutes and {secs} seconds if nobody joins",
                 color=discord.Color.yellow(),
-            )
-        else:
-            embed = discord.Embed(
-                title=f"The server is {status} 📊",
-                description=f"There are currently {srv.conn.client_count()} players online",
-                color=discord.Color.blue(),
             )
 
         await inter.response.send_message(embed=embed)
