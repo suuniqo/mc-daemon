@@ -1,6 +1,8 @@
 import asyncio
 import logging
 
+from typing import Optional
+
 from server.services.conn.protocol import ServerConn
 from server.services.conn.errors import TimeoutExpired
 from server.services.proc.protocol import ServerProc
@@ -34,6 +36,8 @@ class EventCntl(ServerCntl):
         self._ebus: ServerEventBus = ebus
         self._startup_timeout: float = startup_timeout
 
+        self._startup_task: Optional[asyncio.Task] = None
+
         self._ebus.subscribe(ServerEvent.IDLE, lambda: (self.try_close(), None)[1])
         self._ebus.subscribe(ServerEvent.CRASHED, lambda: (self.try_restart(), None)[1])
 
@@ -51,6 +55,7 @@ class EventCntl(ServerCntl):
         self._status = ServerStatus.CLOSED
 
         self._ebus.emit(ServerEvent.HUNG)
+        self._task = None
 
     def status(self) -> ServerStatus:
         return self._status
@@ -69,7 +74,7 @@ class EventCntl(ServerCntl):
 
         try:
             self._proc.start()
-            asyncio.create_task(self._handle_startup())
+            self._task = asyncio.create_task(self._handle_startup())
             return True
         except ProcErr as e:
             self._logger.error(f"Server couldn't be opened: {e}")
@@ -84,6 +89,10 @@ class EventCntl(ServerCntl):
         """
         if self._status != ServerStatus.OPEN:
             return False
+        
+        if self._task is not None and not self._task.done():
+            self._task.cancel()
+            self._task = None
 
         self._status = ServerStatus.CLOSING
 
@@ -112,3 +121,8 @@ class EventCntl(ServerCntl):
         except TimeoutExpired:
             self._logger.warning("Timeout reached opening the server")
             return False
+        except asyncio.CancelledError:
+            self._logger.warning("Server closed before completing startup: idle timeout could be too low")
+            return False
+
+

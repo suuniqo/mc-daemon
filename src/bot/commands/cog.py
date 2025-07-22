@@ -35,8 +35,9 @@ class ServerCommands(commands.Cog):
             embed=discord.Embed(
                 title="Available commands 📋",
                 description=(
-                    "- `/start` Tries to start the server\n"
                     "- `/status` Shows the server status\n"
+                    "- `/start` Tries to start the server\n"
+                    "- `/stop` Tries to stop the server (admin)\n"
                     "- `/lock` Locks and closes the server (admin)\n"
                     "- `/unlock` Unlocks the server (admin)\n"
                     "- `/inject` Executes the provided command in the server (admin)"
@@ -44,6 +45,47 @@ class ServerCommands(commands.Cog):
                 color=discord.Color.yellow(),
             )
         )
+
+    @app_commands.command(name="status", description="Shows the server status")
+    async def status(self, inter: discord.Interaction) -> None:
+        srv = self._server
+
+        status = srv.cntl.status()
+
+        if status != ServerStatus.OPEN:
+            await inter.response.send_message(
+                embed=discord.Embed(
+                    title=f"The server is {status} 📊", color=discord.Color.blue()
+                )
+            )
+            return
+
+        remaining = srv.mntr.timeout_in()
+        client_count = srv.conn.client_count()
+
+        if client_count > 0 or remaining is None:
+            verb = "is" if client_count == 1 else "are"
+            plural = "" if client_count == 1 else "s"
+
+            embed = discord.Embed(
+                title=f"The server is {status} 📊",
+                description=f"There {verb} currently {client_count} player{plural} online",
+                color=discord.Color.blue(),
+            )
+        else:
+            mins = int(remaining // 60)
+            secs = int(remaining % 60)
+
+            min_plural = "" if mins == 1 else "s"
+            sec_plural = "" if secs == 1 else "s"
+
+            embed = discord.Embed(
+                title=f"The server is {status} but empty ⚠️",
+                description=f"It will close in {mins} minute{min_plural} and {secs} second{sec_plural} if nobody joins",
+                color=discord.Color.yellow(),
+            )
+
+        await inter.response.send_message(embed=embed)
 
     @app_commands.command(name="start", description="Tries to start the server")
     async def start(self, inter: discord.Interaction) -> None:
@@ -65,7 +107,8 @@ class ServerCommands(commands.Cog):
 
             if not opened:
                 embed = discord.Embed(
-                    title="The server hung on startup ❌", color=discord.Color.red()
+                    title="The server hung or closed during startup ❌",
+                    color=discord.Color.red(),
                 )
             else:
                 embed = discord.Embed(
@@ -88,6 +131,7 @@ class ServerCommands(commands.Cog):
             case ServerStatus.CLOSING:
                 embed = discord.Embed(
                     title=f"The server is {status}, please stand by ⚠️",
+                    description="Try again when the operation finishes",
                     color=discord.Color.yellow(),
                 )
             case ServerStatus.CLOSED:
@@ -97,40 +141,44 @@ class ServerCommands(commands.Cog):
 
         await inter.response.send_message(embed=embed)
 
-    @app_commands.command(name="status", description="Shows the server status")
-    async def status(self, inter: discord.Interaction) -> None:
+    @app_commands.command(name="stop", description="Tries to stop the server")
+    @app_commands.guild_only()
+    @app_commands.default_permissions(discord.Permissions(administrator=True))
+    async def stop(self, inter: discord.Interaction) -> None:
+        if not await self._validate_guild(inter):
+            return
+
         srv = self._server
+
+        await inter.response.defer()
+
+        if srv.cntl.try_close():
+            await inter.followup.send(embed=discord.Embed(
+                    title=f"The server closed correctly ✅",
+                    color=discord.Color.green(),
+            ))
+            return
 
         status = srv.cntl.status()
 
-        if status != ServerStatus.OPEN:
-            await inter.response.send_message(
-                embed=discord.Embed(
-                    title=f"The server is {status} 📊", color=discord.Color.blue()
+        match status:
+            case ServerStatus.OPEN:
+                embed = discord.Embed(
+                    title="Please try again ❌", color=discord.Color.red()
                 )
-            )
-            return
+            case ServerStatus.OPENING:
+                embed = discord.Embed(
+                    title=f"The server is {status}, please stand by ⚠️",
+                    description="Try again when the operation finishes",
+                    color=discord.Color.yellow(),
+                )
+            case ServerStatus.CLOSING | ServerStatus.CLOSED:
+                embed = discord.Embed(
+                    title=f"The server is already {status} ✅",
+                    color=discord.Color.green(),
+                )
 
-        remaining = srv.mntr.timeout_in()
-        client_count = srv.conn.client_count()
-
-        if client_count > 0 or remaining is None:
-            embed = discord.Embed(
-                title=f"The server is {status} 📊",
-                description=f"There are currently {srv.conn.client_count()} players online",
-                color=discord.Color.blue(),
-            )
-        else:
-            mins = int(remaining // 60)
-            secs = int(remaining % 60)
-
-            embed = discord.Embed(
-                title=f"The server is {status} but empty ⚠️",
-                description=f"It will close in {mins} minutes and {secs} seconds if nobody joins",
-                color=discord.Color.yellow(),
-            )
-
-        await inter.response.send_message(embed=embed)
+        await inter.followup.send(embed=embed)
 
     @app_commands.command(name="lock", description="Locks and closes the server")
     @app_commands.guild_only()
@@ -154,7 +202,7 @@ class ServerCommands(commands.Cog):
             await inter.response.send_message(
                 embed=discord.Embed(
                     title=f"The server can't be locked because it's {status} ❌",
-                    description="Please try again when the operation finishes",
+                    description="Try again when the operation finishes",
                     color=discord.Color.red(),
                 )
             )
@@ -165,7 +213,15 @@ class ServerCommands(commands.Cog):
         await inter.response.defer()
 
         if status == ServerStatus.OPEN:
-            srv.cntl.try_close()
+            if not srv.cntl.try_close():
+                await inter.followup.send(
+                    embed=discord.Embed(
+                        title="The server has been locked but couldn't be closed ⚠️",
+                        description="Try closing it manually now",
+                        color=discord.Color.yellow()
+                    )
+                )
+                return
 
         await inter.followup.send(
             embed=discord.Embed(
