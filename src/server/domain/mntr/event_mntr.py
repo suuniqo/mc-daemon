@@ -89,6 +89,7 @@ class EventMntr(ServerMntr):
             self._ebus.emit(ServerEvent.EMPTY)
         elif time.time() - self._idle_since > self._idle_timeout:
             self._ebus.emit(ServerEvent.IDLE)
+            self._idle_since = None
 
     async def _monitor_loop(self) -> None:
         """
