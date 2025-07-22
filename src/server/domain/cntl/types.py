@@ -8,4 +8,4 @@ class ServerStatus(Enum):
     CLOSING = "CLOSING"
 
     def __str__(self) -> str:
-        return str(self).lower()
+        return self.value.lower()

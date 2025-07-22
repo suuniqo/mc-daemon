@@ -32,7 +32,7 @@ class MinecraftProc(ServerProc):
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
             )
-        except ValueError | OSError as e:
+        except (ValueError, OSError) as e:
             raise ProcErr(f"Failed to start process: {e}")
         except Exception as e:
             raise ProcErr(f"Failed to start process: Unexpected error: {e}")

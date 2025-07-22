@@ -19,7 +19,7 @@ async def main() -> None:
     conf = EnvConfLoader.load()
     bot = await BotFactory.make(conf)
 
-    bot.run(conf.discord_token)
+    await bot.start(conf.discord_token)
 
 
 if __name__ == "__main__":

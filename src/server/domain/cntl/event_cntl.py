@@ -74,6 +74,7 @@ class EventCntl(ServerCntl):
         except ProcErr as e:
             self._logger.error(f"Server couldn't be opened: {e}")
             self._status = ServerStatus.CLOSED
+            self._ebus.emit(ServerEvent.HUNG)
             return False
 
     def try_close(self) -> bool:

@@ -19,24 +19,25 @@ class EventLogger(BotLogger):
         self._client: discord.Client = client
         self._membus: MemoryEventBus = membus
 
-        channel = client.get_channel(channel_id)
-
-        if not isinstance(channel, TextChannel):
-            raise TypeError("Invalid channel id, should be TextChannel")
-
-        self._channel: TextChannel = channel
+        self._channel_id: int = channel_id
 
         self._task: Optional[asyncio.Task] = None
         self._logger: logging.Logger = logging.getLogger(
             f"{__name__}.{self.__class__.__name__}"
         )
 
-    async def _channel_is_valid(self) -> bool:
+    async def _fetch_channel(self) -> Optional[TextChannel]:
+        """
+        Tries to fetch the channel, returns None if the channel isn't a `discord.TextChannel`
+        """
         try:
-            channel = await self._client.fetch_channel(self._channel.id)
-            return channel is not None
+            channel = await self._client.fetch_channel(self._channel_id)
+
+            if isinstance(channel, TextChannel):
+                return channel
+            return None
         except Exception:
-            return False
+            return None
 
     def start(self) -> None:
         if self._task is not None and not self._task.done():
@@ -55,7 +56,7 @@ class EventLogger(BotLogger):
 
     async def _logger_loop(self) -> None:
         try:
-            while await self._channel_is_valid():
+            while (channel := await self._fetch_channel()) is not None:
                 match await self._membus.pop():
                     case ServerEvent.OPENED:
                         embed = discord.Embed(
@@ -108,7 +109,7 @@ class EventLogger(BotLogger):
                             color=discord.Color.yellow(),
                         )
                 try:
-                    await self._channel.send(embed=embed)
+                    await channel.send(embed=embed)
                 except Exception as e:
                     self._logger.error(f"There was an error logging an event: {e}")
         except asyncio.CancelledError:

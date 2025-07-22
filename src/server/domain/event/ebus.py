@@ -23,7 +23,7 @@ class ServerEventBus:
         """
         After emitting an event all the subscribed handlers are called
         """
-        for handler in self._handlers[event]:
+        for handler in self._handlers.get(event, []):
             try:
                 handler()
             except Exception as e:
