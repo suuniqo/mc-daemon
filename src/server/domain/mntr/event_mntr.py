@@ -61,7 +61,6 @@ class EventMntr(ServerMntr):
             self._task = None
             raise MntrErr("Tried to stop monitor while not running yet")
 
-        self._idle_since = None
         self._task.cancel()
 
     def _crash_check(self):
@@ -104,3 +103,4 @@ class EventMntr(ServerMntr):
             pass
         finally:
             self._task = None
+            self._idle_since = None
