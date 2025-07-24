@@ -71,18 +71,18 @@ class EventLogger(BotLogger):
                         )
                     case ServerEvent.OPENING:
                         embed = discord.Embed(
-                            title="The server is starting up... 📊",
+                            title="The server is starting up 📊",
                             color=discord.Color.blue(),
                         )
                     case ServerEvent.CLOSING:
                         embed = discord.Embed(
-                            title="The server is shutting down... 📊",
+                            title="The server is shutting down 📊",
                             color=discord.Color.blue(),
                         )
                     case ServerEvent.CRASHED:
                         embed = discord.Embed(
                             title="The server has crashed ❌",
-                            description="Attempting to restart...",
+                            description="Restart will begin shortly",
                             color=discord.Color.red(),
                         )
                     case ServerEvent.HUNG:
@@ -106,7 +106,7 @@ class EventLogger(BotLogger):
                     case ServerEvent.IDLE:
                         embed = discord.Embed(
                             title="The server has timed out due to inactivity ⚠️",
-                            description="Shutting down...",
+                            description="Shutdown will begin shortly",
                             color=discord.Color.yellow(),
                         )
                 try:
