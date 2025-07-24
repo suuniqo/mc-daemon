@@ -61,6 +61,7 @@ class EventMntr(ServerMntr):
             self._task = None
             raise MntrErr("Tried to stop monitor while not running yet")
 
+        self._idle_since = None
         self._task.cancel()
 
     def _crash_check(self):
@@ -89,7 +90,6 @@ class EventMntr(ServerMntr):
             self._ebus.emit(ServerEvent.EMPTY)
         elif time.time() - self._idle_since > self._idle_timeout:
             self._ebus.emit(ServerEvent.IDLE)
-            self._idle_since = None
 
     async def _monitor_loop(self) -> None:
         """

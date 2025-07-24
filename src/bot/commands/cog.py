@@ -52,10 +52,13 @@ class ServerCommands(commands.Cog):
 
         status = srv.cntl.status()
 
+        await inter.response.defer()
+
         if status != ServerStatus.OPEN:
-            await inter.response.send_message(
+            await inter.followup.send(
                 embed=discord.Embed(
-                    title=f"The server is {status} 📊", color=discord.Color.blue()
+                    title=f"The server is {status} 📊", color=discord.Color.blue(),
+                    description="It is currently locked by admins" if self._locked else None,
                 )
             )
             return
@@ -85,7 +88,7 @@ class ServerCommands(commands.Cog):
                 color=discord.Color.yellow(),
             )
 
-        await inter.response.send_message(embed=embed)
+        await inter.followup.send(embed=embed)
 
     @app_commands.command(name="start", description="Tries to start the server")
     async def start(self, inter: discord.Interaction) -> None:
@@ -201,9 +204,9 @@ class ServerCommands(commands.Cog):
         if status == ServerStatus.OPENING or status == ServerStatus.CLOSING:
             await inter.response.send_message(
                 embed=discord.Embed(
-                    title=f"The server can't be locked because it's {status} ❌",
+                    title=f"The server can't be locked because it's {status} ⚠️",
                     description="Try again when the operation finishes",
-                    color=discord.Color.red(),
+                    color=discord.Color.yellow(),
                 )
             )
             return
