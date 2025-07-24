@@ -55,7 +55,7 @@ class EventCntl(ServerCntl):
         self._status = ServerStatus.CLOSED
 
         self._ebus.emit(ServerEvent.HUNG)
-        self._task = None
+        self._startup_task = None
 
     def status(self) -> ServerStatus:
         return self._status
@@ -74,7 +74,7 @@ class EventCntl(ServerCntl):
 
         try:
             self._proc.start()
-            self._task = asyncio.create_task(self._handle_startup())
+            self._startup_task = asyncio.create_task(self._handle_startup())
             return True
         except ProcErr as e:
             self._logger.error(f"Server couldn't be opened: {e}")
@@ -90,9 +90,9 @@ class EventCntl(ServerCntl):
         if self._status != ServerStatus.OPEN:
             return False
         
-        if self._task is not None and not self._task.done():
-            self._task.cancel()
-            self._task = None
+        if self._startup_task is not None and not self._startup_task.done():
+            self._startup_task.cancel()
+            self._startup_task = None
 
         self._status = ServerStatus.CLOSING
 

@@ -23,6 +23,7 @@ class ServerEventBus:
         """
         After emitting an event all the subscribed handlers are called
         """
+        self._logger.info(f"Event {event} has been emitted")
         for handler in self._handlers.get(event, []):
             try:
                 handler()

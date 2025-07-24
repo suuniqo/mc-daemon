@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import time
 
 from typing import Optional
@@ -8,7 +9,6 @@ from server.domain.event.ebus import ServerEventBus
 from server.services.conn.protocol import ServerConn
 
 from .protocol import ServerMntr
-from .errors import MntrErr
 
 
 class EventMntr(ServerMntr):
@@ -27,6 +27,9 @@ class EventMntr(ServerMntr):
 
         self._task: Optional[asyncio.Task] = None
         self._idle_since: Optional[float] = None
+        self._logger: logging.Logger = logging.getLogger(
+            f"{__name__}.{self.__class__.__name__}"
+        )
 
         self._idle_timeout: float = idle_timeout
         self._polling_intv: float = polling_intv
@@ -45,21 +48,21 @@ class EventMntr(ServerMntr):
     def _start(self) -> None:
         """
         Tries to start the monitor task
-        Raises `MntrErr` if the task was already running
         """
         if self._task is not None and not self._task.done():
-            raise MntrErr("Tried to start monitor while already running")
+            self._logger.warning("Tried to start monitor while already running")
+            return
 
         self._task = asyncio.create_task(self._monitor_loop())
 
     def _stop(self) -> None:
         """
         Tries to stop the monitor task
-        Raises `MntrErr` if the wasn't running
         """
         if self._task is None or self._task.done():
             self._task = None
-            raise MntrErr("Tried to stop monitor while not running yet")
+            self._logger.warning("Tried to stop monitor while not running yet")
+            return
 
         self._task.cancel()
 

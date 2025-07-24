@@ -19,7 +19,10 @@ async def main() -> None:
     conf = EnvConfLoader.load()
     bot = await BotFactory.make(conf)
 
-    await bot.start(conf.discord_token)
+    try:
+        await bot.start(conf.discord_token)
+    except KeyboardInterrupt:
+        await bot.close()
 
 
 if __name__ == "__main__":
