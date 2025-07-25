@@ -3,7 +3,7 @@ Enhance the experience of managing a self-hosted Minecraft server.
 
 ## What is mc-daemon?
 
-`mc-daemon` is a highly extensible service designed to improve the experience of both you managing the server, and the players interacting with it help you manage your Minecraft server.
+`mc-daemon` is a highly extensible service designed to improve the experience of both administrators managing the server, and players interacting with it.
 
 It's features are organized in two main layers:
 - **Embedded Layer**: Automates routine tasks such as detecting server crashes and shutting down the server when it's empty for a while
