@@ -1,6 +1,7 @@
 import discord
 
 from bot.commands.cog import ServerCommands
+from bot.validate.http_validate import HttpValidate
 from bot.logger.event_logger import EventLogger
 
 from server.domain.event.types import ServerEvent
@@ -20,6 +21,12 @@ class BotFactory:
         """
         Makes a new instance of `McDaemonBot` through `ServerConf`
         """
+        await HttpValidate.validate_discord_config(
+            conf.discord_token,
+            conf.discord_guild,
+            [conf.discord_log_channel] if conf.discord_log_channel else [],
+        )
+
         intents = discord.Intents.default()
         intents.message_content = True
 
