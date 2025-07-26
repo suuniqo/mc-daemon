@@ -15,9 +15,9 @@ With the use of dependency injection and an event-driven architecture, implement
 
 ## Table of Contents
 - [Features](#features)
+- [Requirements](#requirements)
 - [Setup](#setup)
-- [Configuration](#setup)
-- [Troubleshooting](#setup)
+- [Configuration](#configuration)
 
 
 ## Features
@@ -62,6 +62,16 @@ And the following private commands:
 Optionally, you can also configure logging of server events in a discord channel.
 
 ![channel logging demo](.github/assets/chann-logging.png)
+
+
+## Requirements
+Before setting up, ensure you have:
+
+- **Minecraft Server**: A self-hosted Minecraft server that runs correctly.
+- **RCON**: RCON enabled on your Minecraft server for command execution.
+- **Startup Script**: A script that properly starts your Minecraft server when executed.
+- **Discord Server**: A Discord guild dedicated to your Minecraft server where you have administrator permissions.
+- **Discord Bot**: A Discord application with a valid API token from the [Discord Developer Portal](https://discord.com/developers/applications).
 
 
 ## Setup
@@ -160,8 +170,3 @@ PROCESS_SCRIPT=
     ``` 
     icacls .env /inheritance:r /grant:r "%USERNAME%:F"
     ``` 
-
-
-## Troubleshooting
-rcon on
-admin guild
