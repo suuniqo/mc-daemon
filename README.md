@@ -51,3 +51,8 @@ And the following private commands:
 - `/inject` Executes a Minecraft command on the server through the rcon protocol and displays the output.
 
     ![inject command demo](.github/assets/comm-inject.png)
+
+Optionally, you can also configure logging of server events in a discord channel.
+
+![channel logging demo](.github/assets/chann-logging.png)
+
