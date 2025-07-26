@@ -65,7 +65,7 @@ Optionally, you can also configure logging of server events in a discord channel
 
 
 ## Requirements
-efore setting up, ensure you have:
+Before setting up, ensure you have:
 
 - **Minecraft Server**: A self-hosted Minecraft server that runs correctly.
 - **RCON**: RCON enabled on your Minecraft server for command execution.
