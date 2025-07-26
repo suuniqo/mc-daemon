@@ -16,6 +16,7 @@ With the use of dependency injection and an event-driven architecture, implement
 ## Table of Contents
 - [Features](#features)
 - [Setup](#setup)
+- [Configuration](#setup)
 - [Troubleshooting](#setup)
 
 
@@ -64,5 +65,33 @@ Optionally, you can also configure logging of server events in a discord channel
 
 
 ## Setup
+1. Clone and navigate to the repository:
+   ```
+   git clone https://github.com/suuniqo/mc-daemon.git
+   cd mc-daemon
+   ``` 
+
+2. Create and activate a virtual environment:
+    - On Windows:
+       ```
+       python -m venv venv
+       venv\Scripts\activate
+       ``` 
+
+    - On Linux and macOS:
+       ```
+       python3 -m venv venv
+       source venv/bin/activate
+       ``` 
+
+3. Install the dependencies
+   ```
+   pip install -r requirements.txt
+   ``` 
+
+4. Configure the `.env` file (see [Configuration](#configuration))
+
+
+## Configuration
 
 ## Troubleshooting
