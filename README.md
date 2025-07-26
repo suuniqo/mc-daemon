@@ -84,13 +84,20 @@ Optionally, you can also configure logging of server events in a discord channel
        source venv/bin/activate
        ``` 
 
-3. Install the dependencies
+3. Install the dependencies:
    ```
    pip install -r requirements.txt
    ``` 
 
 4. Configure the `.env` file (see [Configuration](#configuration))
 
+5. Run the program:
+   ```
+   python src/main.py
+   ``` 
+
+> [!TIP]
+> Rather than running the program interactively, it is recommended to set it up as a background daemon or service for continuous operation. For Linux see [systemd guide](https://akashrajpurohit.com/blog/keep-your-services-running-in-the-background-with-systemd/).
 
 ## Configuration
 
