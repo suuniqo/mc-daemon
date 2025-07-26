@@ -112,6 +112,13 @@ To setup the application, in the same machine where you host your Minecraft serv
 > [!TIP]
 > Rather than running the program interactively, it is recommended to set it up as a background daemon or service for continuous operation. For Linux see [systemd guide](https://akashrajpurohit.com/blog/keep-your-services-running-in-the-background-with-systemd/).
 
+6. Finally, add the Discord bot to your guild through an OAuth2 link in the Discord Developer Portal. 
+
+> [!WARNING]
+> In the Discord Developer Portal, ensure that:
+> - On the Bot section of the application you toggle Message Content Intent.
+> - When creating the OAuth2 link you grant the bot administrator permissions.
+
 
 ## Configuration
 `mc-daemon` can be easily configured through a `.env` file.
