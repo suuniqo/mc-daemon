@@ -45,5 +45,5 @@ class GlobalConf:
         self.startup_timeout: float = startup_timeout or 2.0 * 60.0
 
         # mntr config
-        self.idle_timeout: float = idle_timeout or 5.0 * 60.0
+        self.idle_timeout: Optional[float] = idle_timeout or None
         self.polling_intv: float = polling_intv or 60.0

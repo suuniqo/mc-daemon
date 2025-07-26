@@ -14,12 +14,12 @@ from .protocol import ServerMntr
 class EventMntr(ServerMntr):
     def __init__(
         self,
-        idle_timeout: float,
+        idle_timeout: Optional[float],
         polling_intv: float,
         conn: ServerConn,
         ebus: ServerEventBus,
     ) -> None:
-        if idle_timeout <= 0:
+        if idle_timeout is not None and idle_timeout <= 0:
             raise ValueError("Startup timeout must be greater than zero")
 
         if polling_intv <= 0:
@@ -31,7 +31,7 @@ class EventMntr(ServerMntr):
             f"{__name__}.{self.__class__.__name__}"
         )
 
-        self._idle_timeout: float = idle_timeout
+        self._idle_timeout: Optional[float] = idle_timeout
         self._polling_intv: float = polling_intv
         self._conn: ServerConn = conn
         self._ebus: ServerEventBus = ebus
@@ -40,6 +40,8 @@ class EventMntr(ServerMntr):
         self._ebus.subscribe(ServerEvent.CLOSING, self._stop)
 
     def timeout_in(self) -> Optional[float]:
+        if self._idle_timeout is None:
+            return None
         if self._idle_since is None:
             return None
 
@@ -81,6 +83,9 @@ class EventMntr(ServerMntr):
         Emits `EMPTY` if it has emptied after just being occupied
         Emits `IDLE` if it has been empty longer than the provided timeout
         """
+        if self._idle_timeout is None:
+            return
+
         if not self._conn.is_empty():
             if self._idle_since is not None:
                 self._ebus.emit(ServerEvent.OCCUPIED)

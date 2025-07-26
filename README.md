@@ -18,6 +18,7 @@ With the use of dependency injection and an event-driven architecture, implement
 - [Requirements](#requirements)
 - [Setup](#setup)
 - [Configuration](#configuration)
+- [Troubleshooting](#troubleshooting)
 
 
 ## Features
@@ -59,7 +60,7 @@ And the following private commands:
 
     ![inject command demo](.github/assets/comm-inject.png)
 
-Optionally, you can also configure logging of server events in a discord channel.
+Optionally, you can also configure logging of server events in a discord channel:
 
 ![channel logging demo](.github/assets/chann-logging.png)
 
@@ -75,6 +76,8 @@ Before setting up, ensure you have:
 
 
 ## Setup
+To setup the application, in the same machine where you host your Minecraft server, follow this steps:
+
 1. Clone and navigate to the repository:
    ```bash
    git clone https://github.com/suuniqo/mc-daemon.git
@@ -156,7 +159,7 @@ PROCESS_SCRIPT=
 
 # Server Lifecycle
 # STARTUP_TIMEOUT=60                  # Server startup timeout - add at least 10s to your average startup time
-# IDLE_TIMEOUT=300                    # How long server stays empty before auto-shutdown (seconds)
+# IDLE_TIMEOUT=                       # How long server stays empty before auto-shutdown (seconds)
 # POLLING_INTV=60                     # How often the monitor checks if the server is empty or has crashed (seconds)
 ``` 
 
@@ -168,6 +171,10 @@ PROCESS_SCRIPT=
     ``` 
 
     - On Windows:
-    ``` 
+    ```bash 
     icacls .env /inheritance:r /grant:r "%USERNAME%:F"
     ``` 
+
+
+## Troubleshooting
+Having trouble? Please create a [GitHub Issue](https://github.com/suuniqo/mc-daemon/issues/new) - it helps improving the app and assisting other users facing similar problems. Include error messages and your setup details for faster resolution!
