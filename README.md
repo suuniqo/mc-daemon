@@ -66,33 +66,33 @@ Optionally, you can also configure logging of server events in a discord channel
 
 ## Setup
 1. Clone and navigate to the repository:
-   ```
+   ```bash
    git clone https://github.com/suuniqo/mc-daemon.git
    cd mc-daemon
    ``` 
 
 2. Create and activate a virtual environment:
     - On Windows:
-       ```
+       ```bash
        python -m venv venv
        venv\Scripts\activate
        ``` 
 
     - On Linux and macOS:
-       ```
+       ```bash
        python3 -m venv venv
        source venv/bin/activate
        ``` 
 
 3. Install the dependencies:
-   ```
+   ```bash
    pip install -r requirements.txt
    ``` 
 
 4. Configure the `.env` file (see [Configuration](#configuration))
 
 5. Run the program:
-   ```
+   ```bash
    python src/main.py
    ``` 
 
@@ -100,5 +100,75 @@ Optionally, you can also configure logging of server events in a discord channel
 > Rather than running the program interactively, it is recommended to set it up as a background daemon or service for continuous operation. For Linux see [systemd guide](https://akashrajpurohit.com/blog/keep-your-services-running-in-the-background-with-systemd/).
 
 ## Configuration
+`mc-daemon` can be easily configured through a `.env` file.
+
+1. Create a new file named `.env` on the repository root 
+
+2. Paste the following configuration template. For the application to work you need to fill the mandatory fields. Modify the optional ones as needed.
+
+    ```bash
+# =============================================================================
+# MC-DAEMON - ENVIRONMENT CONFIGURATION
+# =============================================================================
+# Required fields must be filled - the app won't start without them
+
+# =============================================================================
+# REQUIRED CONFIGURATION (mandatory)
+# =============================================================================
+
+# Your Discord bot token (get from: https://discord.com/developers/applications)
+    DISCORD_TOKEN=
+
+# Your Discord server ID (enable Developer Mode, right-click server, copy ID)
+    DISCORD_GUILD=
+
+# Path to your Minecraft server startup script
+    PROCESS_SCRIPT=
+
+# =============================================================================
+# OPTIONAL CONFIGURATION (uncomment and modify as needed)
+# =============================================================================
+
+# Discord Settings
+# DISCORD_LOG_CHANNEL=                # Channel ID for bot event logging
+
+# Process Management  
+# PROCESS_TIMEOUT=8                   # Timeout for process operations (seconds)
+
+# Minecraft Server Configuration
+# MINECRAFT_PORT=25565                # Minecraft server port
+# RCON_PORT=25575                     # RCON port
+# RCON_PWD=                           # RCON password (if configured)
+# RCON_TIMEOUT=8                      # RCON response timeout (seconds)
+# RCON_MAX_COMM_LEN=256               # Maximum command length
+# RCON_BANNED_COMM=                   # Banned commands (comma-separated: "/stop,/whitelist,/op")
+
+# Server Lifecycle
+# STARTUP_TIMEOUT=60                  # Server startup timeout - add 10s to your average startup time
+# IDLE_TIMEOUT=300                    # How long server stays empty before auto-shutdown (seconds)
+# POLLING_INTV=60                     # How often the monitor checks if the server is empty or has crashed (seconds)
+
+# =============================================================================
+# SETUP NOTES:
+# - Fill in required values above (remove placeholder comments)
+# - Uncomment optional settings you want to customize
+# - Add this file to .gitignore - never commit tokens to version control
+# - Set secure file permissions: chmod 600 .env
+# =============================================================================
+    ``` 
+
+5. Set the correct file permissions:
+    - On Windows:
+    ``` 
+    icacls .env /inheritance:r /grant:r "%USERNAME%:F"
+    ``` 
+
+    - On Linux and 
+    ```bash 
+    chmod 600 .env
+    ``` 
+
 
 ## Troubleshooting
+rcon on
+admin guild
