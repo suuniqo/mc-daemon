@@ -170,6 +170,9 @@ PROCESS_SCRIPT=
 # POLLING_INTV=60                     # How often the monitor checks if the server is empty or has crashed (seconds)
 ``` 
 
+> [!NOTE]
+> It's strongly recommended to configure `IDLE_TIMEOUT` unless you have specific reasons not to. Without this setting, your server will continue running indefinitely even when empty, wasting significant system resources.
+
 3. Set the correct file permissions:
 
     - On Linux and macOS:
