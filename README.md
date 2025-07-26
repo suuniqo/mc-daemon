@@ -72,16 +72,16 @@ Optionally, you can also configure logging of server events in a discord channel
    ``` 
 
 2. Create and activate a virtual environment:
-    - On Windows:
-       ```bash
-       python -m venv venv
-       venv\Scripts\activate
-       ``` 
-
     - On Linux and macOS:
        ```bash
        python3 -m venv venv
        source venv/bin/activate
+       ``` 
+
+    - On Windows:
+       ```bash
+       python -m venv venv
+       venv\Scripts\activate
        ``` 
 
 3. Install the dependencies:
@@ -158,14 +158,15 @@ PROCESS_SCRIPT=
 ``` 
 
 5. Set the correct file permissions:
+
+    - On Linux and macOS:
+    ```bash 
+    chmod 600 .env
+    ``` 
+
     - On Windows:
     ``` 
     icacls .env /inheritance:r /grant:r "%USERNAME%:F"
-    ``` 
-
-    - On Linux and 
-    ```bash 
-    chmod 600 .env
     ``` 
 
 
