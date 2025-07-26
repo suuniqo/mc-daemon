@@ -48,6 +48,6 @@ And the following private commands:
 
 - `/unlock` Unlocks the server, meaning users can run again the `/start` command.
 
-- `/inject` Executes a Minecraft command on the server through the rcon protocol.
+- `/inject` Executes a Minecraft command on the server through the rcon protocol and displays the output.
 
     ![inject command demo](.github/assets/comm-inject.png)
