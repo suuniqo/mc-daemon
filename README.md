@@ -45,11 +45,11 @@ The bot provides the following public commands:
 
     ![start command demo](.github/assets/comm-start.png)
 
-- `/stop` Stops the server instance
-
 - `/help` Lists the available bot commands
 
 And the following private commands:
+
+- `/stop` Stops the server instance
 
 - `/lock` Stops and locks the server instance, meaning no one can start the server until `/unlock` is run. This command is useful when performaing server maintenance.
 
