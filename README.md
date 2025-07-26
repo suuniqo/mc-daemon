@@ -35,4 +35,7 @@ The bot provides the following public commands:
     ![status command demo](.github/assets/comm-status.png)
 
 - `/start` Starts the server instance and notifies the user when it's ready to join.
-    ![start command demo](.github/assets/comm-start.gif)
+
+    ![start command demo](.github/assets/comm-start.png)
+
+- `/help` Lists the available bot commands
