@@ -2,7 +2,6 @@
 Enhance the experience of managing a self-hosted Minecraft server.
 
 ## What is mc-daemon?
-
 `mc-daemon` is a highly extensible service designed to improve the experience of both administrators managing the server, and players interacting with it.
 
 It's features are organized in two main layers:
@@ -12,6 +11,13 @@ It's features are organized in two main layers:
 For instance, instead of having to manually open the server each time a player wants to join, users can simply use the `/start` command on Discord to open the server themselves.
 
 With the use of dependency injection and an event-driven architecture, implementing new features, adding new slash commands, or even adapting the project to another game is really straightforward. Feel free to fork the project and customize it to your needs.
+
+
+## Table of Contents
+- [Features](#features)
+- [Setup](#setup)
+- [Troubleshooting](#setup)
+
 
 ## Features
 This section provides a detailed overview of the app's functionalities
@@ -56,3 +62,7 @@ Optionally, you can also configure logging of server events in a discord channel
 
 ![channel logging demo](.github/assets/chann-logging.png)
 
+
+## Setup
+
+## Troubleshooting
