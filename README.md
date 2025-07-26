@@ -147,17 +147,9 @@ PROCESS_SCRIPT=
 # STARTUP_TIMEOUT=60                  # Server startup timeout - add 10s to your average startup time
 # IDLE_TIMEOUT=300                    # How long server stays empty before auto-shutdown (seconds)
 # POLLING_INTV=60                     # How often the monitor checks if the server is empty or has crashed (seconds)
-
-# =============================================================================
-# SETUP NOTES:
-# - Fill in required values above (remove placeholder comments)
-# - Uncomment optional settings you want to customize
-# - Add this file to .gitignore - never commit tokens to version control
-# - Set secure file permissions: chmod 600 .env
-# =============================================================================
 ``` 
 
-5. Set the correct file permissions:
+3. Set the correct file permissions:
 
     - On Linux and macOS:
     ```bash 
