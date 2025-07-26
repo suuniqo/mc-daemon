@@ -65,7 +65,7 @@ Optionally, you can also configure logging of server events in a discord channel
 
 
 ## Requirements
-Before setting up, ensure you have:
+efore setting up, ensure you have:
 
 - **Minecraft Server**: A self-hosted Minecraft server that runs correctly.
 - **RCON**: RCON enabled on your Minecraft server for command execution.
@@ -108,6 +108,7 @@ Before setting up, ensure you have:
 
 > [!TIP]
 > Rather than running the program interactively, it is recommended to set it up as a background daemon or service for continuous operation. For Linux see [systemd guide](https://akashrajpurohit.com/blog/keep-your-services-running-in-the-background-with-systemd/).
+
 
 ## Configuration
 `mc-daemon` can be easily configured through a `.env` file.
@@ -154,7 +155,7 @@ PROCESS_SCRIPT=
 # RCON_BANNED_COMM=                   # Banned commands (comma-separated: "/stop,/whitelist,/op")
 
 # Server Lifecycle
-# STARTUP_TIMEOUT=60                  # Server startup timeout - add 10s to your average startup time
+# STARTUP_TIMEOUT=60                  # Server startup timeout - add at least 10s to your average startup time
 # IDLE_TIMEOUT=300                    # How long server stays empty before auto-shutdown (seconds)
 # POLLING_INTV=60                     # How often the monitor checks if the server is empty or has crashed (seconds)
 ``` 
