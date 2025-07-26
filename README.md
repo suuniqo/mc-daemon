@@ -109,7 +109,7 @@ To setup the application, in the same machine where you host your Minecraft serv
    python src/main.py
    ``` 
 
-> [!TIP]
+> [!NOTE]
 > Rather than running the program interactively, it is recommended to set it up as a background daemon or service for continuous operation. For Linux see [systemd guide](https://akashrajpurohit.com/blog/keep-your-services-running-in-the-background-with-systemd/).
 
 6. Finally, add the Discord bot to your guild through an OAuth2 link in the Discord Developer Portal. 
