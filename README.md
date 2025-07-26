@@ -106,7 +106,7 @@ Optionally, you can also configure logging of server events in a discord channel
 
 2. Paste the following configuration template. For the application to work you need to fill the mandatory fields. Modify the optional ones as needed.
 
-    ```bash
+```bash
 # =============================================================================
 # MC-DAEMON - ENVIRONMENT CONFIGURATION
 # =============================================================================
@@ -155,7 +155,7 @@ Optionally, you can also configure logging of server events in a discord channel
 # - Add this file to .gitignore - never commit tokens to version control
 # - Set secure file permissions: chmod 600 .env
 # =============================================================================
-    ``` 
+``` 
 
 5. Set the correct file permissions:
     - On Windows:
