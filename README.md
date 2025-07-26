@@ -14,17 +14,18 @@ For instance, instead of having to manually open the server each time a player w
 With the use of dependency injection and an event-driven architecture, implementing new features, adding new slash commands, or even adapting the project to another game is really straightforward. Feel free to fork the project and customize it to your needs.
 
 ## Features
-In this section the app functionalities will be explained in more detail.
+This section provides a detailed overview of the app's functionalities
 
 ### Embedded Layer
-Is responsible for directly managing and controlling the Minecraft server instance.
+This layer is responsible for directly managing and controlling the Minecraft server instance.
 
 It provides the server administrators with:
 - Handling of unexpected conditions such as server crashes or freezes, where the process is automatically terminated, cleaned up and restarted.
 - Server activity monitoring, with configurable threshholds to define how long the server needs to remain empty before triggering a shutdown.
 
 ### Discord Integration Layer
-Enables both players and administrators to interact with the server process through Discord slash commans. These are divided into two categories:
+This layer enables both players and administrators to interact with the server process through Discord slash commans.
 
-- **Public Commands:** Available for everyone, both in guilds and DMs.
-- **Private Commands:** Only accesible to guild administratora and only on the specified guild. In other case someone could just create a new guild, add the bot and use them.
+Commands are divided into two categories:
+- **Public Commands:** Available for everyone, wether in a server (guild) or direct messages (DMs).
+- **Private Commands:** Restricted to guild administratora of the specified guild. This prevents someone from just creating a new guild, add the bot and use them.
