@@ -24,8 +24,11 @@ It provides the server administrators with:
 - Server activity monitoring, with configurable threshholds to define how long the server needs to remain empty before triggering a shutdown.
 
 ### Discord Integration Layer
-This layer enables both players and administrators to interact with the server process through Discord slash commans.
-
-Commands are divided into two categories:
+This layer enables both players and administrators to interact with the server process through Discord slash commans. Commands are divided into two categories:
 - **Public Commands:** Available for everyone, wether in a server (guild) or direct messages (DMs).
-- **Private Commands:** Restricted to guild administratora of the specified guild. This prevents someone from just creating a new guild, add the bot and use them.
+- **Private Commands:** Restricted to guild administratora of the specified guild. This prevents someone from just creating a new guild, adding the bot and gaining unautorized control.
+
+The bot provides the following public commands:
+
+- `/status` Reports the current server status
+![status command demo](.github/assets/comm-status.png)
