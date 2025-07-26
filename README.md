@@ -39,3 +39,5 @@ The bot provides the following public commands:
     ![start command demo](.github/assets/comm-start.png)
 
 - `/help` Lists the available bot commands
+
+    ![help command demo](.github/assets/comm-help-fake.png)
