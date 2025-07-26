@@ -177,4 +177,4 @@ PROCESS_SCRIPT=
 
 
 ## Troubleshooting
-Having trouble? Please create a [GitHub Issue](https://github.com/suuniqo/mc-daemon/issues/new) - it helps improving the app and assisting other users facing similar problems. Include error messages and your setup details for faster resolution!
+Having trouble? Please create a [GitHub Issue](https://github.com/suuniqo/mc-daemon/issues/new) - It helps improving the app and assisting other users facing similar problems. Include error messages and your setup details for faster resolution!
