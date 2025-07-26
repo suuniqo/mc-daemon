@@ -46,7 +46,7 @@ And the following private commands:
 
 - `/lock` Stops and locks the server instance, meaning no one can start the server until `/unlock` is run. This command is useful when performaing server maintenance.
 
-- `/unlock` Unlocks the server, meaning now users can run `/start` command.
+- `/unlock` Unlocks the server, meaning users can run again the `/start` command.
 
 - `/inject` Executes a Minecraft command on the server through the rcon protocol.
 
