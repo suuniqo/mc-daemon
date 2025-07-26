@@ -31,5 +31,4 @@ This layer enables both players and administrators to interact with the server p
 The bot provides the following public commands:
 
 - `/status` Reports the current server status
-
-![status command demo](.github/assets/comm-status.png)
+    ![status command demo](.github/assets/comm-status.png)
