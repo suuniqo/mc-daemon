@@ -96,8 +96,8 @@ Optionally, you can also configure logging of server events in a discord channel
    python src/main.py
    ``` 
 
-> [!TIP]
-> Rather than running the program interactively, it is recommended to set it up as a background daemon or service for continuous operation. For Linux see [systemd guide](https://akashrajpurohit.com/blog/keep-your-services-running-in-the-background-with-systemd/).
+    > [!TIP]
+    > Rather than running the program interactively, it is recommended to set it up as a background daemon or service for continuous operation. For Linux see [systemd guide](https://akashrajpurohit.com/blog/keep-your-services-running-in-the-background-with-systemd/).
 
 ## Configuration
 
