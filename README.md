@@ -38,6 +38,16 @@ The bot provides the following public commands:
 
     ![start command demo](.github/assets/comm-start.png)
 
+- `/stop` Stops the server instance
+
 - `/help` Lists the available bot commands
 
-    ![help command demo](.github/assets/comm-help-fake.png)
+And the following private commands:
+
+- `/lock` Stops and locks the server instance, meaning no one can start the server until `/unlock` is run. This command is useful when performaing server maintenance.
+
+- `/unlock` Unlocks the server, meaning now users can run `/start` command.
+
+- `/inject` Executes a Minecraft command on the server through the rcon protocol.
+
+    ![inject command demo](.github/assets/comm-inject.png)
