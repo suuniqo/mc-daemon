@@ -117,13 +117,13 @@ Optionally, you can also configure logging of server events in a discord channel
 # =============================================================================
 
 # Your Discord bot token (get from: https://discord.com/developers/applications)
-    DISCORD_TOKEN=
+DISCORD_TOKEN=
 
 # Your Discord server ID (enable Developer Mode, right-click server, copy ID)
-    DISCORD_GUILD=
+DISCORD_GUILD=
 
 # Path to your Minecraft server startup script
-    PROCESS_SCRIPT=
+PROCESS_SCRIPT=
 
 # =============================================================================
 # OPTIONAL CONFIGURATION (uncomment and modify as needed)
