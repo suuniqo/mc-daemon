@@ -176,14 +176,14 @@ PROCESS_SCRIPT=
 3. Set the correct file permissions:
 
     - On Linux and macOS:
-    ```bash 
-    chmod 600 .env
-    ``` 
+        ```bash 
+        chmod 600 .env
+        ``` 
 
     - On Windows:
-    ```bash 
-    icacls .env /inheritance:r /grant:r "%USERNAME%:F"
-    ``` 
+        ```bash 
+        icacls .env /inheritance:r /grant:r "%USERNAME%:F"
+        ``` 
 
 
 ## Troubleshooting
