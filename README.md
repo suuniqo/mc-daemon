@@ -125,16 +125,17 @@ To setup the application, in the same machine where you host your Minecraft serv
 
 1. Create a new file named `.env` on the repository root 
 
-2. Paste the following configuration template. For the application to work you need to fill the mandatory fields. Modify the optional ones as needed.
+2. Paste the following configuration template. For the application to work you need to fill the mandatory fields. Uncomment and modify the optional ones as needed.
 
 ```bash
 # =============================================================================
 # MC-DAEMON - ENVIRONMENT CONFIGURATION
 # =============================================================================
 # Required fields must be filled - the app won't start without them
+# Uncomment and modify the optional ones as needed
 
 # =============================================================================
-# REQUIRED CONFIGURATION (mandatory)
+# REQUIRED CONFIGURATION
 # =============================================================================
 
 # Your Discord bot token (get from: https://discord.com/developers/applications)
@@ -147,7 +148,7 @@ DISCORD_GUILD=
 PROCESS_SCRIPT=
 
 # =============================================================================
-# OPTIONAL CONFIGURATION (uncomment and modify as needed)
+# OPTIONAL CONFIGURATION
 # =============================================================================
 
 # Discord Settings
