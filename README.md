@@ -171,7 +171,7 @@ PROCESS_SCRIPT=
 # RCON_BANNED_COMM=                   # Banned commands (comma-separated: "/stop,/whitelist,/op")
 
 # Server Lifecycle
-# STARTUP_TIMEOUT=60                  # Server startup timeout - add at least 10s to your average startup time
+# STARTUP_TIMEOUT=60                  # Server startup timeout - add at least 30s to your average startup time
 # IDLE_TIMEOUT=                       # How long server stays empty before auto-shutdown (seconds)
 # POLLING_INTV=60                     # How often the monitor checks if the server is empty or has crashed (seconds)
 ``` 
