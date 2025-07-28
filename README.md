@@ -6,9 +6,6 @@ Enhance the experience of managing a self-hosted Minecraft server.
     <img src=".github/assets/comms-2.png" style="width: 49%;">
 </p>
 
-![bot commands demo 1](.github/assets/comms-1.png)
-![bot commands demo 2](.github/assets/comms-2.png)
-
 ## What is mc-daemon?
 `mc-daemon` is a highly extensible service designed to improve the experience of both administrators managing the server, and players interacting with it.
 
