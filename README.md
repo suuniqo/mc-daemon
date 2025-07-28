@@ -1,6 +1,11 @@
 # mc-daemon
 Enhance the experience of managing a self-hosted Minecraft server.
 
+<p style="display: flex; justify-content: space-between;">
+    <img src=".github/assets/comms-1.png" style="width: 49%;">
+    <img src=".github/assets/comms-2.png" style="width: 49%;">
+</p>
+
 ![bot commands demo 1](.github/assets/comms-1.png)
 ![bot commands demo 2](.github/assets/comms-2.png)
 
